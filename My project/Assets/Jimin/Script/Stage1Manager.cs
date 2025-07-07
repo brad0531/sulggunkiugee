@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class Stage1Manager : MonoBehaviour
 {
     public GameObject Monster;
-    public Vector2 PlayerRespawnPoint;
+    public Vector3 PlayerRespawnPoint;
 
     void SpawnMonster()
     {

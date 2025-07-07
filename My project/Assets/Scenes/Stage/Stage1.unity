@@ -222,7 +222,7 @@ GameObject:
   - component: {fileID: 182095343}
   m_Layer: 5
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -243,7 +243,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -9500, y: 410}
+  m_AnchoredPosition: {x: -353, y: 1486}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!212 &182095343
@@ -586,6 +586,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e6e00415b3bdb64e865166ba5123d6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Monster: {fileID: 1288730079}
+  PlayerRespawnPoint: {x: -365, y: 410, z: 0}
 --- !u!1 &1288730079
 GameObject:
   m_ObjectHideFlags: 0
@@ -619,7 +621,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8500, y: 410}
+  m_AnchoredPosition: {x: 289, y: 1485}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!212 &1288730081
