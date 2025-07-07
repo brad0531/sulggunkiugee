@@ -1,40 +1,64 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-public class Stage1Manager : MonoBehaviour
+[ExecuteAlways]
+public class UIFollowWorldObject : MonoBehaviour
 {
-    public GameObject Monster;
-    public Vector3 PlayerRespawnPoint;
+    public GameObject worldTarget;
+    public Vector3 targetWorldPosition;
+    public RectTransform uiElement;
 
-    void SpawnMonster()
-    {
-        Vector3 playerPosition = GameObject.FindWithTag("Player").transform.position;
-        GameObject enemy = (GameObject)Instantiate(Monster, new Vector3(playerPosition.x + 1000, playerPosition.y), Quaternion.identity);
-        for (int i = 1; i < 10; i++) {
-            GameObject enemys = (GameObject)Instantiate(Monster, new Vector3(playerPosition.x +1500 + 1200*i, playerPosition.y), Quaternion.identity);
-        }
-    }
+    private Canvas _canvas;
+    private Camera _cam;
+    private RectTransform _canvasRect;
 
-    void Respawn()
+    void Awake()
     {
-        //if() //스테이지 이동
+        if (uiElement == null)
+            uiElement = GetComponent<RectTransform>();
+
+        _canvas = uiElement.GetComponentInParent<Canvas>();
+        if (_canvas == null || _canvas.renderMode != RenderMode.WorldSpace)
         {
-            GameObject.FindWithTag("Player").transform.position = PlayerRespawnPoint;
+            Debug.LogError("WorldSpace Canvas 안에 이 스크립트를 사용해야 합니다.");
+            enabled = false;
+            return;
         }
-         
-    }
 
-    void Start()
-    {
-        Respawn();
-        Invoke("SpawnMonster", 1f);
+        _canvasRect = _canvas.GetComponent<RectTransform>();
+        _cam = _canvas.worldCamera != null ? _canvas.worldCamera : Camera.main;
     }
 
     void Update()
     {
-        /* if () {
-            SceneManager.LoadScene("Stage2"); 
+        Vector3 worldPos = worldTarget != null
+            ? worldTarget.transform.position
+            : targetWorldPosition;
+
+        MoveUITo(worldPos);
+    }
+
+    void MoveUITo(Vector3 worldPos)
+    {
+        Vector2 screenPt = RectTransformUtility.WorldToScreenPoint(_cam, worldPos);
+        Vector2 localPt;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _canvasRect, screenPt, _cam, out localPt);
+        if (uiElement.anchorMin == Vector2.zero && uiElement.anchorMax == Vector2.one)
+        {
+            Vector2 size = uiElement.rect.size;
+            Vector2 pivot = uiElement.pivot;
+
+            Vector2 newMin = localPt - Vector2.Scale(size, pivot);
+            Vector2 newMax = newMin + size;
+
+            uiElement.offsetMin = newMin;
+            uiElement.offsetMax = newMax;
         }
-        */
+        else
+        {
+            uiElement.anchoredPosition = localPt;
+        }
     }
 }
