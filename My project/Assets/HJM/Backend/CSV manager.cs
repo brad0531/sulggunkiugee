@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     public string costFileName = "Costs/Cost_CSV.csv"; //코스트 데이터
     public string UserData_FilePath = "UserData/UserData.json";
     private List<KeyValuePair<string, int>[]> csvData = new List<KeyValuePair<string, int>[]>();
-    public List<List<int>> CostData;
+    public List<List<int>> CostData = new List<List<int>> ();
     public UserData_type UserData = new UserData_type(); //유저 데이터 저장 변수
     private void Awake()
     {
@@ -32,9 +32,18 @@ public class GameManager : MonoBehaviour
     {
         int result = 0;
         result += LoadCost();
-
+        result += LoadUserData();
         if (result > 0)
             Debug.LogError($"----------------------------------------\n데이터 불러오는 중 오류 발생 :: {result}개\n");
+    }
+    public void Setting()
+    {
+        UserData.ATK = 10;
+        UserData.ATK_speed = 10.0;
+        UserData.CritPercent = 0.3;
+        UserData.MaxHP = UserData.HP = 100;
+        UserData.money = 1000000;
+        UserData.liver = 0;
     }
     public void SaveUserData()
     {
@@ -43,7 +52,7 @@ public class GameManager : MonoBehaviour
         File.WriteAllText(path, json);
         Debug.Log("저장 완료: " + path);
     }
-    public int LoadData()
+    public int LoadUserData()
     {
         string path = Path.Combine(Application.persistentDataPath, UserData_FilePath);
 
@@ -51,14 +60,15 @@ public class GameManager : MonoBehaviour
         {
             string json = File.ReadAllText(path);
             UserData = JsonUtility.FromJson<UserData_type>(json);
-            if(isTesting)
+            if (isTesting)
                 Debug.Log("불러오기 완료");
             return 0;
         }
         else
         {
-            Debug.LogWarning("LoadData:: 저장된 파일이 없습니다.");
-            return 1;
+            Debug.LogWarning("LoadData:: 저장된 파일이 없습니다. 유저 데이터 초기화.");
+            Setting();
+            return 0;
         }
     }
     public int LoadCost()
@@ -67,7 +77,7 @@ public class GameManager : MonoBehaviour
         if (!File.Exists(path))
         {
             Debug.LogError($"Cost CSV 파일을 찾을 수 없습니다: {path}\n");
-            return 0;
+            return 1;
         }
 
         CostData.Clear();
@@ -79,18 +89,23 @@ public class GameManager : MonoBehaviour
             {
                 string line = sr.ReadLine();
                 string[] values = line.Split(',');
-
+                CostData.Add(new List<int>());
                 foreach (string obj in values)
                 {
-                    CostData[index].Add(int.Parse(obj));
+                    if (!int.TryParse(obj, out int result))
+                    {
+                        // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
+                        continue;
+                    }
+                    CostData[index].Add(result);
                 }
 
                 index++;
             }
         }
-
-        Debug.Log($"CSV 로드 완료: {csvData.Count}줄\n");
-        return 1;
+        if(isTesting)
+            Debug.Log($"CSV 로드 완료: {CostData.Count}줄\n");
+        return 0;
     }
 
     // 초기화
@@ -126,7 +141,14 @@ public class GameManager : MonoBehaviour
     {
         return UserData.ATK;
     }
-    
+    public int getMoney()
+    {
+        return UserData.money;
+    }
+    public int getLiver()
+    {
+        return UserData.liver;
+    }
     public int getHP()
     {
         return UserData.HP;
@@ -147,6 +169,15 @@ public class GameManager : MonoBehaviour
     {
         UserData.HP = Math.Min(HP, getMaxHP()); //에이 설마 maxHP를 넘는 HP 데이터를 주겠어?? 대응
     }
+    public void setMoney(int money)
+    {
+        UserData.money = money;
+    }
+    public void setLiver(int liver)
+    {
+        UserData.liver = liver;
+    }
+    
 }
 
 [Serializable]
@@ -154,5 +185,8 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
 {
     public int ATK, HP, MaxHP;
     public double ATK_speed, CritPercent;
-    public List<int> levels = new List<int>();
+    public List<int> levels = new List<int>(); //각 스탯 강화 레벨 기록
+    public int money, liver; //돈과 간 수치
+
+    public List<int> effects;
 }
