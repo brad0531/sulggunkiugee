@@ -17,6 +17,6 @@ public class StatusLevel : MonoBehaviour
         GameManager.Instance.setMoney(money);
         GameManager.Instance.setATK(GameManager.Instance.LoadATK_Per_Level(level));
         GameManager.Instance.UserData.status_levels[0]++; // ATK 레벨업
-        Debug.Log($"레벨업 성공!\n현재 ATK : {GameManager.Instance.getATK()}\n현재 잔고 : {GameManager.Instance.getMoney()}");
+        Debug.Log($"레벨업 성공! 현재 ATK : {GameManager.Instance.getATK()} | 현재 잔고 : {GameManager.Instance.getMoney()}");
     }
 }
