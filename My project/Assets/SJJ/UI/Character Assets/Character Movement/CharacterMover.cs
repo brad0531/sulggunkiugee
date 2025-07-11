@@ -11,8 +11,8 @@ public class CharacterMover : MonoBehaviour
     public Animator animator;
     void Start()
     {
-        characterTransform.position = targetPosition;
-        MoveTo(new Vector3(5f, 0f, 0f));
+        characterTransform.position = targetPosition; // 타겟이 되는 포지션으로 이동(지금은 0, 0, 0) 나중에는 시작점
+        //MoveTo(new Vector3(5f, 0f, 0f)); 
     }
     void Update()
     {
