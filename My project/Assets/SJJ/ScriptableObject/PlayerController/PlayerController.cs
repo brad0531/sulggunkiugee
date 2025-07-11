@@ -17,9 +17,22 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
+        MoveForward();
+    }
+    void Attack()
+    {
+        // 데미지 계산
+        int damage = attackPower;
+
+        // 콘솔에 데미지 결과 출력
+        Debug.Log($"플레이어가 몬스터를 공격! 데미지: {damage}, 몬스터 남은 체력: currentmosterHP - damage");
+    }
+
+    void MoveForward()
+    {
         if (monster == null || isAttacking) return;
 
-        float distanceX = Mathf.Abs(monster.position.x - transform.position.x);
+        float distanceX = GetDistanceToMonster();
         if (distanceX > attackRange)
         {
             // 전진
@@ -34,12 +47,8 @@ public class PlayerController : MonoBehaviour
             Attack();
         }
     }
-    void Attack()
+    private float GetDistanceToMonster()
     {
-        // 데미지 계산
-        int damage = attackPower;
-
-        // 콘솔에 데미지 결과 출력
-        Debug.Log($"플레이어가 몬스터를 공격! 데미지: {damage}, 몬스터 남은 체력: currentmosterHP - damage");
+        return Mathf.Abs(monster.position.x - transform.position.x);
     }
 }
