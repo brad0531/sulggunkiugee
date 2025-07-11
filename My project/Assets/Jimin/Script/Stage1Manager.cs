@@ -1,64 +1,56 @@
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
-[ExecuteAlways]
-public class UIFollowWorldObject : MonoBehaviour
+public class Stage1Manager : MonoBehaviour
 {
-    public GameObject worldTarget;
-    public Vector3 targetWorldPosition;
-    public RectTransform uiElement;
+    public GameObject Monster;
 
-    private Canvas _canvas;
-    private Camera _cam;
-    private RectTransform _canvasRect;
+    private GameObject enemy;
+    private GameObject enemys;
 
-    void Awake()
+    private bool isRespawning = false;
+
+    void SpawnMonsters()
     {
-        if (uiElement == null)
-            uiElement = GetComponent<RectTransform>();
-
-        _canvas = uiElement.GetComponentInParent<Canvas>();
-        if (_canvas == null || _canvas.renderMode != RenderMode.WorldSpace)
+        Monster.SetActive(true);
+        Vector3 playerPosition = GameObject.FindWithTag("Player").transform.position;
+        enemy = (GameObject)Instantiate(Monster, new Vector3(playerPosition.x + 500, playerPosition.y), Quaternion.identity);
+        for (int i = 1; i < 10; i++)
         {
-            Debug.LogError("WorldSpace Canvas 안에 이 스크립트를 사용해야 합니다.");
-            enabled = false;
-            return;
+            enemys = (GameObject)Instantiate(Monster, new Vector3(playerPosition.x + 500 + 1200 * i, playerPosition.y), Quaternion.identity);
         }
+        isRespawning = false;
+    }
 
-        _canvasRect = _canvas.GetComponent<RectTransform>();
-        _cam = _canvas.worldCamera != null ? _canvas.worldCamera : Camera.main;
+    void Respawn()
+    {
+        //정재가 만든 플레이어 리스폰 함수 호출 
+        // 혹시 몰라서 허락 받고 하려고 남겨둠
+        SpawnMonsters();
+    }
+
+
+
+    void Start()
+    {
+        Respawn();
     }
 
     void Update()
     {
-        Vector3 worldPos = worldTarget != null
-            ? worldTarget.transform.position
-            : targetWorldPosition;
-
-        MoveUITo(worldPos);
-    }
-
-    void MoveUITo(Vector3 worldPos)
-    {
-        Vector2 screenPt = RectTransformUtility.WorldToScreenPoint(_cam, worldPos);
-        Vector2 localPt;
-
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _canvasRect, screenPt, _cam, out localPt);
-        if (uiElement.anchorMin == Vector2.zero && uiElement.anchorMax == Vector2.one)
+        for (int i = 0; i < 3; i++)
         {
-            Vector2 size = uiElement.rect.size;
-            Vector2 pivot = uiElement.pivot;
-
-            Vector2 newMin = localPt - Vector2.Scale(size, pivot);
-            Vector2 newMax = newMin + size;
-
-            uiElement.offsetMin = newMin;
-            uiElement.offsetMax = newMax;
+            if (enemy != null && enemys != null) {
+                if (!enemy.activeSelf && !enemys.activeSelf)
+                {
+                    isRespawning = true;
+                    Invoke("Respawn", 3f);
+                }
+            }
         }
-        else
-        {
-            uiElement.anchoredPosition = localPt;
+        /* if () {
+            SceneManager.LoadScene("Stage2"); 
         }
+        */
     }
 }
