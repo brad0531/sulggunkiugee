@@ -5,11 +5,18 @@ using System.Linq;
 using System;
 using System.Data;
 using System.Linq.Expressions;
-
+public class Utility
+{
+    public long get_times() //utc 시간 (표준 시간)
+    {
+        return DateTime.UtcNow.Ticks;
+    }
+}
 public class GameManager : MonoBehaviour
 {
 
     #region 데이터 선언
+    private Utility utility = new Utility();
     public static GameManager Instance { get; private set; }
     private bool isTesting = true;
     [Header("CSV 파일 상대 경로 (StreamingAssets 기준)")]
@@ -143,7 +150,7 @@ public class GameManager : MonoBehaviour
     }
 
     //강화 레벨별 스탯 반환함수
-    
+
     private int LoadATKdatas()
     {
         string path = Path.Combine(Application.streamingAssetsPath, "Level Data/Attack.csv");
@@ -307,7 +314,7 @@ public class GameManager : MonoBehaviour
                 Monster_lists.Add(index[tmp], new Pair<int, int>(result, 0));
                 tmp++;
             }
-            
+
             line = sr.ReadLine();
             values = line.Split(',');
             tmp = 0;
@@ -467,29 +474,74 @@ public class GameManager : MonoBehaviour
     #endregion
 
 
+    #region 몬스터 데이터 getter/setter
+    public void setMonster(Tuple<int, int> stage)
+    {
+        Pair<int, int> key_data = new Pair<int, int>(stage);
+        UserData.monster.HP = UserData.monster.MaxHP = Monster_lists[key_data].First;
+        UserData.monster.ATK = Monster_lists[key_data].Second;
+        UserData.monster.last_Attack = 0;
+    }
+    public int getMonsterATK()
+    {
+        return UserData.monster.ATK;
+    }
+    public int getMonsterMaxHP()
+    {
+        return UserData.monster.MaxHP;
+    }
+    public int getMonsterHP()
+    {
+        return UserData.monster.HP;
+    }
+    public void setMonsterHP(int HP)
+    {
+        UserData.monster.HP = Math.Max(0, HP);
+    }
+    
+    #endregion
+
+
     #region 전투 관련
-    public bool canAttack(int last_date, double AttackSpeed)
+    public bool canAttack(long last_date, double AttackSpeed)
     {
-        return true;
+        long nowTime = utility.get_times();
+        long speed_tmp = (int)(AttackSpeed * 10000000.0);
+        if ((nowTime - last_date) >= speed_tmp)
+            return true;
+        return false;
     }
-    public bool Player_Attack(int dmg)
+    public bool canPlayerAttack()
     {
-        UserData.monster.HP = Math.Max(0, UserData.monster.HP - dmg);
-        if (UserData.monster.HP == 0)
-            return false;
-        return true;
+        return canAttack(UserData.last_Attack, UserData.ATK_speed);
     }
+    public bool canMonsterAttack()
+    {
+        return canAttack(UserData.monster.last_Attack, 3.0);
+    }
+    public void PlayerAttack() //공격했다는 것을 기록함
+    {
+        UserData.last_Attack = utility.get_times();
+    }
+    public void MonsterAttack() //공격했다는 것을 기록함
+    {
+        UserData.monster.last_Attack = utility.get_times();
+    }
+
     #endregion
 
 
     #region 기타 등등
     //기타 등등
-    public Tuple<int, int> getStage()
+    public Tuple<int, int> getStage() //현재 플레이어가 어떤 스테이지에 있는지 튜플 형태로 반환합니다.
     {
         return UserData.stage.toTuple();
     }
+    public void setStage(Tuple<int, int> stage) {
+        UserData.stage = new Pair<int, int>(stage);
+    }
     //AttackSpeed 수치에 대해 공격 가능한 타이밍인지 여부를 반환합니다.(미구현)
-    
+
     #endregion
 
 }
@@ -504,14 +556,14 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public int money, liver; //돈과 간 수치
     public List<int> effects; //버프, 디버프 시간 저장
     public Pair<int, int> stage;
-    public int last_Attack;
+    public long last_Attack;
     public Monster monster;
 }
 
 public class Monster
 {
-    public int MaxHP, HP;
-    public int ATK, last_Attack;
+    public int MaxHP, HP, ATK;
+    public long last_Attack;
 }
 
 public class Pair<T, U>
@@ -524,11 +576,17 @@ public class Pair<T, U>
         this.First = first;
         this.Second = second;
     }
+    public Pair(Tuple<T, U> tmp)
+    {
+        First = tmp.Item1;
+        Second = tmp.Item2;
+    }
 
     public override string ToString()
     {
         return $"({First}, {Second})";
     }
+
 
     public Tuple<T, U> toTuple()
     {
