@@ -5,18 +5,19 @@ using System.Linq;
 using System;
 using System.Data;
 using System.Linq.Expressions;
-public class Utility
+public class GameUtility
 {
     public long get_times() //utc 시간 (표준 시간)
     {
         return DateTime.UtcNow.Ticks;
     }
+
 }
 public class GameManager : MonoBehaviour
 {
 
     #region 데이터 선언
-    private Utility utility = new Utility();
+    private GameUtility utility = new GameUtility();
     public static GameManager Instance { get; private set; }
     private bool isTesting = true;
     [Header("CSV 파일 상대 경로 (StreamingAssets 기준)")]
@@ -593,4 +594,4 @@ public class Pair<T, U>
         return new Tuple<T, U>(this.First, this.Second);
     }
 
-};
+}
