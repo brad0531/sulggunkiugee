@@ -5,14 +5,7 @@ using System.Linq;
 using System;
 using System.Data;
 using System.Linq.Expressions;
-public class GameUtility
-{
-    public long get_times() //utc 시간 (표준 시간)
-    {
-        return DateTime.UtcNow.Ticks;
-    }
 
-}
 public class GameManager : MonoBehaviour
 {
 
@@ -566,7 +559,16 @@ public class Monster
     public int MaxHP, HP, ATK;
     public long last_Attack;
 }
+#region 게임 유틸리티
+public class GameUtility
+{
+    public long get_times() //utc 시간 (표준 시간)
+    {
+        return DateTime.UtcNow.Ticks;
+    }
 
+}
+#endregion
 public class Pair<T, U>
 {
     public T First { get; set; }
