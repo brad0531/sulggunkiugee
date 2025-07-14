@@ -222,9 +222,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   attackRange: 3
+  moveDistance: 30
   attackPower: 1
   animator: {fileID: 0}
-  monster: {fileID: 1333873544}
+  monsters: []
 --- !u!114 &300932610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -404,6 +405,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1333873544}
   - component: {fileID: 1333873543}
+  - component: {fileID: 1333873545}
   m_Layer: 0
   m_Name: Enemy UI_0
   m_TagString: Monster
@@ -481,6 +483,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1333873545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1333873542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monsterhp: 1
 --- !u!1 &1851535324
 GameObject:
   m_ObjectHideFlags: 0
@@ -491,6 +506,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1851535326}
   - component: {fileID: 1851535325}
+  - component: {fileID: 1851535327}
   m_Layer: 0
   m_Name: Enemy UI_1
   m_TagString: Monster
@@ -568,6 +584,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1851535327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1851535324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monsterhp: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
