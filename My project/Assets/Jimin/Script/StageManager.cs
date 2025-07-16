@@ -17,7 +17,7 @@ public class StageManager : MonoBehaviour
     private GameObject BossMon;
 
     private bool isRespawning = false;
-    private int Stagelevel = 1;
+    private int Stagelevel = 0;
     private List<GameObject> enemiesList = new List<GameObject>();
 
     void SpawnMonsters()
@@ -64,28 +64,28 @@ public class StageManager : MonoBehaviour
             }
 
         }
-      // 감이 안 잡힘 함수를 이렇게 짜는 게 과연 효율적일까.........
     }
 
 
 
     void Start()
     {
-        //1-0
-        Respawn();
+        // 1-0
+        // 플레이어 리스폰 함수 호출 
+        SpawnMonsters();
     }
 
     void Update()
     {
 
-        //1-1 ~ 1-4
+        //1-0 ~ 1-4
         if (Stagelevel <= 4)
         {
             if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning)
             {
                 isRespawning = true;
                 Stagelevel++;
-                Invoke("Respawn", 3f);
+                Respawn();
             }
         }
    
