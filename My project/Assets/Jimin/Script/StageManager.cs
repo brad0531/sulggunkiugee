@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using Microsoft.Unity.VisualStudio.Editor;
+using System.Runtime.ExceptionServices;
 
-public class Stage1Manager : MonoBehaviour
+public class StageManager : MonoBehaviour
 {
     public GameObject Monster;
     public GameObject Boss;
+    public FadeInOut fadeEffect;
 
     private GameObject enemy;
     private GameObject enemies;
@@ -34,6 +37,7 @@ public class Stage1Manager : MonoBehaviour
 
     void BossSpawn()
     {
+        FadeInOut.Fade(fadeEffect);
         // 플레이어 리스폰 함수 호출 
         Vector3 playerPosition = GameObject.FindWithTag("Player").transform.position;
         BossMon = (GameObject)Instantiate(Boss, new Vector3(playerPosition.x + 500, playerPosition.y), Quaternion.identity);
@@ -42,9 +46,25 @@ public class Stage1Manager : MonoBehaviour
 
     void Respawn()
     {
+        FadeInOut.Fade(fadeEffect);
         //정재가 만든 플레이어 리스폰 함수 호출 
         // 혹시 몰라서 허락 받고 하려고 남겨둠
         SpawnMonsters();
+    }
+
+
+    void Playerdying()
+    {
+         //if(플레이어 죽음 판정 시)
+        {
+            Stagelevel--;
+            foreach (var e in enemiesList)
+            {
+                e.SetActive(false);
+            }
+
+        }
+      // 감이 안 잡힘 함수를 이렇게 짜는 게 과연 효율적일까.........
     }
 
 
@@ -88,6 +108,7 @@ public class Stage1Manager : MonoBehaviour
         {
             if (!isRespawning && BossMon != null && !BossMon.activeSelf)
             {
+                FadeInOut.Fade(fadeEffect);
                 SceneManager.LoadScene("Stage2");
             }
         }
