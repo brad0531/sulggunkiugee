@@ -453,6 +453,10 @@ public class GameManager : MonoBehaviour
     {
         UserData.MaxHP = HP;
     }
+    public void setAttackSpeed(double speed)
+    {
+        UserData.ATK_speed = speed;
+    }
     public void setCRIpercent(double percent)
     {
         UserData.CritPercent = percent;
