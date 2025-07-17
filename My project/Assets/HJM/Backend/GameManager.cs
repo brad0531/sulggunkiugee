@@ -326,6 +326,11 @@ public class GameManager : MonoBehaviour
         if (isTesting)
         {
             Debug.Log($"Normal Monster CSV 로드 완료: {Monster_lists.Count}개\n");
+            Debug.Log("=== Monster_lists 전체 출력 ===");
+            foreach (var kvp in Monster_lists)
+            {
+                Debug.Log($"Stage {kvp.Key} -> HP: {Monster_lists[kvp.Key].First}, ATK: {Monster_lists[kvp.Key].Second}");
+            }
         }
         return 0;
     }
@@ -491,7 +496,7 @@ public class GameManager : MonoBehaviour
 
 
     #region 몬스터 데이터 getter/setter
-    public void setMonster(Tuple<int, int> stage)
+    public void setMonster(System.Tuple<int, int> stage)
     {
         Pair<int, int> key_data = new Pair<int, int>(stage);
         UserData.monster.HP = UserData.monster.MaxHP = Monster_lists[key_data].First;
@@ -602,7 +607,7 @@ public class Pair<T, U>
         Second = second;
     }
 
-    public Pair(Tuple<T, U> tmp)
+    public Pair(System.Tuple<T, U> tmp)
     {
         First = tmp.Item1;
         Second = tmp.Item2;
