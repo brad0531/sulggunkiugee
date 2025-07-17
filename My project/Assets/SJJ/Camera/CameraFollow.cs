@@ -9,6 +9,10 @@ public class CameraFollow : MonoBehaviour
 
     private Camera cam;
 
+    private void Start()
+    {
+        Camera.main.targetTexture = null;
+    }
     void Awake()
     {
         cam = GetComponent<Camera>();

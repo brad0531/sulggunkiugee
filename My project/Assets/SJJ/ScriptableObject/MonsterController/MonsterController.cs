@@ -16,24 +16,18 @@ public class MonsterController : MonoBehaviour
     private int currentHP;
     private int maxHP;
     private int attackPower;
-    void Start()
+    void Update()
     {
-        // GameManager에서 몬스터 스탯 설정
-        //GameManager.Instance.setMonster(new System.Tuple<int, int>(stageNum, monsterIndex));
-        // 아니 왜 안되는거에요 대체
-
-        // 몬스터 스탯
-        maxHP = 2;
-        currentHP = maxHP;
-        attackPower = 1; // 1은 모두 예시.
-
-        //Debug.Log($"[몬스터 생성] 스테이지 {stageNum}-{monsterIndex} | HP: {currentHP}, ATK: {attackPower}");
+        // 몬스터 스탯 세팅
+        GameManager.Instance.setMonster(new System.Tuple<int, int>(stageNum, monsterIndex));
+        maxHP = GameManager.Instance.getMonsterMaxHP();
+        currentHP = GameManager.Instance.getMonsterHP();
+        attackPower = GameManager.Instance.getMonsterATK();
     }
     public void MonsterTakeDamage(int damage)
     {
         currentHP -= damage;
         currentHP = Mathf.Max(0, currentHP);
-        // GameManager.Instance.setMonsterHP(currentHP); 왜 버그가 나지 일단 주석처리 해놓을게.
         if (currentHP <= 0)
         {
             Die();
