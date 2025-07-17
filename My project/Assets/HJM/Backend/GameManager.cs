@@ -324,7 +324,9 @@ public class GameManager : MonoBehaviour
             }
         }
         if (isTesting)
+        {
             Debug.Log($"Normal Monster CSV 로드 완료: {Monster_lists.Count}개\n");
+        }
         return 0;
     }
 
@@ -409,7 +411,7 @@ public class GameManager : MonoBehaviour
     {
         return UserData.ATK;
     }
-    public int getATKData()
+    public int getCurrentATK()
     {
         return UserData.ATK;
     }
@@ -429,11 +431,27 @@ public class GameManager : MonoBehaviour
     {
         return UserData.MaxHP;
     }
+    public int getCurrentMaxHP()
+    {
+        return UserData.MaxHP;
+    }
+    public int getCurrentHP()
+    {
+        return UserData.HP;
+    }
     public double getCritPercent()
     {
         return UserData.CritPercent;
     }
+    public double getCurrentCritPercent()
+    {
+        return UserData.CritPercent;
+    }
     public double getATK_speed()
+    {
+        return UserData.ATK_speed;
+    }
+    public double getCurrentATK_speed()
     {
         return UserData.ATK_speed;
     }
@@ -580,9 +598,10 @@ public class Pair<T, U>
 
     public Pair(T first, U second)
     {
-        this.First = first;
-        this.Second = second;
+        First = first;
+        Second = second;
     }
+
     public Pair(Tuple<T, U> tmp)
     {
         First = tmp.Item1;
@@ -594,10 +613,25 @@ public class Pair<T, U>
         return $"({First}, {Second})";
     }
 
-
     public Tuple<T, U> toTuple()
     {
-        return new Tuple<T, U>(this.First, this.Second);
+        return new Tuple<T, U>(First, Second);
     }
 
+    public override bool Equals(object obj)
+    {
+        if (obj is Pair<T, U> other)
+        {
+            return EqualityComparer<T>.Default.Equals(this.First, other.First)
+                && EqualityComparer<U>.Default.Equals(this.Second, other.Second);
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        int hash1 = First == null ? 0 : EqualityComparer<T>.Default.GetHashCode(First);
+        int hash2 = Second == null ? 0 : EqualityComparer<U>.Default.GetHashCode(Second);
+        return HashCode.Combine(hash1, hash2); // .NET Core 2.1+ / .NET Standard 2.1+ / .NET Framework 4.7.2+
+    }
 }
