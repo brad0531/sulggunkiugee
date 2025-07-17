@@ -23,8 +23,8 @@ public class MonsterController : MonoBehaviour
         // 아니 왜 안되는거에요 대체
 
         // 몬스터 스탯
-        maxHP = 1;
-        currentHP = 1;
+        maxHP = 2;
+        currentHP = maxHP;
         attackPower = 1; // 1은 모두 예시.
 
         //Debug.Log($"[몬스터 생성] 스테이지 {stageNum}-{monsterIndex} | HP: {currentHP}, ATK: {attackPower}");
