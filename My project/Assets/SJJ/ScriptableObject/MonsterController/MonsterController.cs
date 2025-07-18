@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using UnityEditor.EditorTools;
@@ -19,6 +20,7 @@ public class MonsterController : MonoBehaviour
     void Update()
     {
         // 몬스터 스탯 세팅
+
         GameManager.Instance.setMonster(new System.Tuple<int, int>(stageNum, monsterIndex));
         MonstermaxHP = GameManager.Instance.getMonsterMaxHP();
         MonstercurrentHP = GameManager.Instance.getMonsterHP();
