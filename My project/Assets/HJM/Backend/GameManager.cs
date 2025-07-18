@@ -514,7 +514,6 @@ public class GameManager : MonoBehaviour
         
         if (Monster_lists.TryGetValue(stage, out Tuple<int, int> monsterData))
         {
-            Debug.Log($"로그:: {monsterData.Item1}, {monsterData.Item2}");
             UserData.monster.HP = monsterData.Item1;
             UserData.monster.MaxHP = monsterData.Item1;
             UserData.monster.ATK = monsterData.Item2;
