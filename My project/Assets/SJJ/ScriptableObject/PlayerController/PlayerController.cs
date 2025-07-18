@@ -70,6 +70,7 @@ public class PlayerController : MonoBehaviour
         {
             isMonsterAttacking = true;
             MonsterAttack();
+            GameManager.Instance.MonsterAttack();
         }
     }
 
