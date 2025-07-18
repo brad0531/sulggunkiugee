@@ -5,7 +5,7 @@ public class CharacterMover : MonoBehaviour
 {
     public Transform characterTransform; // Character 이미지의 Transform
     public float moveSpeed = 5f; // 이동 속도
-    private Vector2 targetPosition = new Vector3(0f, 0f, 0f);
+    private Vector2 targetPosition = new Vector3(0f, 10f, 0f);
     private bool isMoving = false;
 
     public Animator animator;

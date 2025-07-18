@@ -30,7 +30,9 @@ public class PlayerController : MonoBehaviour
     {
         // 플레이어 스탯 설정
         PlayerHP = GameManager.Instance.getHP();
+        Debug.Log($"플레이어의 체력을 불러옵니다. 현재 체력은 {PlayerHP}입니다.");
         PlayerattackPower = GameManager.Instance.getATK();
+        Debug.Log($"플레이어의 공격력을 불러옵니다. 현재 체력은 {PlayerattackPower}입니다.");
 
         // "Monster" 태그가 붙은 모든 오브젝트의 Transform을 리스트에 저장
         GameObject[] monsterObjects = GameObject.FindGameObjectsWithTag("Monster");

@@ -31,7 +31,14 @@ public class CameraFollow : MonoBehaviour
     }
     private Vector3 GetDesiredPosition()
     {
-        return target.position + offset;
+        {
+            // x만 타겟 기준으로 따라가고, y/z는 offset을 유지
+            return new Vector3(
+                target.position.x + offset.x,
+                target.position.y + offset.y, // offset 유지
+                target.position.z + offset.z  // offset 유지
+            );
+        }
     }
     private void MoveCamera(Vector3 desiredPosition)
     {

@@ -25,6 +25,7 @@ public class MonsterController : MonoBehaviour
         MonstermaxHP = GameManager.Instance.getMonsterMaxHP();
         MonstercurrentHP = GameManager.Instance.getMonsterHP();
         MonsterattackPower = GameManager.Instance.getMonsterATK();
+        Debug.Log($"몬스터의 체력과 공격력을 불러옵니다. 현재 체력은 {MonstercurrentHP}, 공격력은 {MonsterattackPower}입니다.");
     }
     public void MonsterTakeDamage(int damage)
     {
