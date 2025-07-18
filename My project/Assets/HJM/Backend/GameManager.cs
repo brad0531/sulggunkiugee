@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     private List<int> HP_levels_lists = new List<int>();
     private List<double> ATKspeed_levels_lists = new List<double>();
     private List<double> CRIpercent_levels_lists = new List<double>();
-    private Dictionary<Pair<int, int>, Pair<int, int>> Monster_lists = new Dictionary<Pair<int, int>, Pair<int, int>>();
+    private Dictionary<Tuple<int, int>, Tuple<int, int>> Monster_lists = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
     #endregion
 
 
@@ -65,7 +65,9 @@ public class GameManager : MonoBehaviour
         UserData.MaxHP = UserData.HP = LoadHP_Per_Level(0);
         UserData.money = 1000000;
         UserData.liver = 0;
-
+        UserData.stage = new Tuple<int, int>(1, 0);
+        Debug.Log("데이터 불러오기");
+        setMonster(new Tuple<int, int>(1, 0));   
         for (int i = 0; i < 4; i++)
         {
             UserData.status_levels.Add(0);
@@ -278,7 +280,7 @@ public class GameManager : MonoBehaviour
         }
         using (StreamReader sr = new StreamReader(path))
         {
-            List<Pair<int, int>> index = new List<Pair<int, int>>();
+            List<Tuple<int, int>> index = new List<Tuple<int, int>>();
             int tmp = 0;
             string line = sr.ReadLine();
             string[] values = line.Split(',');
@@ -291,7 +293,7 @@ public class GameManager : MonoBehaviour
                 int F = int.Parse(stage_str[0]);
                 int S = int.Parse(stage_str[1]);
 
-                index.Add(new Pair<int, int>(F, S));
+                index.Add(new Tuple<int, int>(F, S));
             }
 
             line = sr.ReadLine();
@@ -305,7 +307,7 @@ public class GameManager : MonoBehaviour
                     // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
                     continue;
                 }
-                Monster_lists.Add(index[tmp], new Pair<int, int>(result, 0));
+                Monster_lists.Add(index[tmp], new Tuple<int, int>(result, 0));
                 tmp++;
             }
 
@@ -319,7 +321,7 @@ public class GameManager : MonoBehaviour
                     // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
                     continue;
                 }
-                Monster_lists[index[tmp]].Second = result;
+                Monster_lists[index[tmp]] = new Tuple<int, int>(Monster_lists[index[tmp]].Item1, result);
                 tmp++;
             }
         }
@@ -329,7 +331,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("=== Monster_lists 전체 출력 ===");
             foreach (var kvp in Monster_lists)
             {
-                Debug.Log($"Stage {kvp.Key} -> HP: {Monster_lists[kvp.Key].First}, ATK: {Monster_lists[kvp.Key].Second}");
+                Debug.Log($"Stage {kvp.Key} -> HP: {Monster_lists[kvp.Key].Item1}, ATK: {Monster_lists[kvp.Key].Item2}");
             }
         }
         return 0;
@@ -496,12 +498,33 @@ public class GameManager : MonoBehaviour
 
 
     #region 몬스터 데이터 getter/setter
-    public void setMonster(System.Tuple<int, int> stage)
+    public void setMonster(Tuple<int, int> stage)
     {
-        Pair<int, int> key_data = new Pair<int, int>(stage);
-        UserData.monster.HP = UserData.monster.MaxHP = Monster_lists[key_data].First;
-        UserData.monster.ATK = Monster_lists[key_data].Second;
-        UserData.monster.last_Attack = 0;
+        if (Monster_lists == null)
+        {
+            Debug.LogError("monsterDictionary가 null입니다.");
+            return;
+        }
+
+        if (!Monster_lists.ContainsKey(stage))
+        {
+            Debug.LogError($"monsterDictionary에 해당 키 ({stage.Item1}, {stage.Item2})가 없습니다.");
+            return;
+        }
+        
+        if (Monster_lists.TryGetValue(stage, out Tuple<int, int> monsterData))
+        {
+            Debug.Log($"로그:: {monsterData.Item1}, {monsterData.Item2}");
+            UserData.monster.HP = monsterData.Item1;
+            UserData.monster.MaxHP = monsterData.Item1;
+            UserData.monster.ATK = monsterData.Item2;
+            UserData.monster.last_Attack = 0;
+        }
+        else
+        {
+            Debug.LogError($"오류 발생:: {stage.Item1}, {stage.Item2}");
+        }
+
     }
     public int getMonsterATK()
     {
@@ -519,7 +542,7 @@ public class GameManager : MonoBehaviour
     {
         UserData.monster.HP = Math.Max(0, HP);
     }
-    
+
     #endregion
 
 
@@ -556,10 +579,22 @@ public class GameManager : MonoBehaviour
     //기타 등등
     public Tuple<int, int> getStage() //현재 플레이어가 어떤 스테이지에 있는지 튜플 형태로 반환합니다.
     {
-        return UserData.stage.toTuple();
+        return UserData.stage;
     }
-    public void setStage(Tuple<int, int> stage) {
-        UserData.stage = new Pair<int, int>(stage);
+    public void setStage(Tuple<int, int> stage)
+    {
+        UserData.stage = stage;
+    }
+    public bool isVaildStage(Tuple<int, int> stage)
+    {
+        if (Monster_lists.TryGetValue(stage, out Tuple<int, int> monsterData))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     //AttackSpeed 수치에 대해 공격 가능한 타이밍인지 여부를 반환합니다.(미구현)
 
@@ -568,6 +603,12 @@ public class GameManager : MonoBehaviour
 }
 
 [Serializable]
+
+public class Monster
+{
+    public int MaxHP, HP, ATK;
+    public long last_Attack;
+}
 public class UserData_type //세이브 및 로드할 데이터 json형태
 {
     public int ATK, HP, MaxHP;
@@ -576,16 +617,12 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public List<int> skill_level = new List<int>();
     public int money, liver; //돈과 간 수치
     public List<int> effects; //버프, 디버프 시간 저장
-    public Pair<int, int> stage;
+    public Tuple<int, int> stage;
     public long last_Attack;
-    public Monster monster;
+    public Monster monster = new Monster();
 }
 
-public class Monster
-{
-    public int MaxHP, HP, ATK;
-    public long last_Attack;
-}
+
 #region 게임 유틸리티
 public class GameUtility
 {
@@ -612,7 +649,6 @@ public class Pair<T, U>
         First = tmp.Item1;
         Second = tmp.Item2;
     }
-
     public override string ToString()
     {
         return $"({First}, {Second})";
