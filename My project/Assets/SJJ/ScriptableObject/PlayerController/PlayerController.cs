@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework.Internal;
@@ -41,6 +42,8 @@ public class PlayerController : MonoBehaviour
         // 몬스터 인덱스 할당, 위치 조정을 여기서 해도 좋을 듯
         for (int  i = 0; i < monsterObjects.Length; i++)
         {
+            if (!GameManager.Instance.isVaildStage(new Tuple<int, int>(GameManager.Instance.getStage().Item1, i)))
+                continue;
             GameObject obj = monsterObjects[i];
             monsters.Add(obj.transform);
             MonsterController mc = obj.GetComponent<MonsterController>();
