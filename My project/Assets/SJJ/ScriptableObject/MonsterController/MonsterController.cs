@@ -13,22 +13,22 @@ public class MonsterController : MonoBehaviour
     public int monsterIndex = 0; // 몬스터 인덱스
     public int count = 10; // 몬스터 개수
 
-    private int currentHP;
-    private int maxHP;
-    private int attackPower;
+    private int MonstercurrentHP;
+    private int MonstermaxHP;
+    private int MonsterattackPower;
     void Update()
     {
         // 몬스터 스탯 세팅
         GameManager.Instance.setMonster(new System.Tuple<int, int>(stageNum, monsterIndex));
-        maxHP = GameManager.Instance.getMonsterMaxHP();
-        currentHP = GameManager.Instance.getMonsterHP();
-        attackPower = GameManager.Instance.getMonsterATK();
+        MonstermaxHP = GameManager.Instance.getMonsterMaxHP();
+        MonstercurrentHP = GameManager.Instance.getMonsterHP();
+        MonsterattackPower = GameManager.Instance.getMonsterATK();
     }
     public void MonsterTakeDamage(int damage)
     {
-        currentHP -= damage;
-        currentHP = Mathf.Max(0, currentHP);
-        if (currentHP <= 0)
+        MonstercurrentHP -= damage;
+        MonstercurrentHP = Mathf.Max(0, MonstercurrentHP);
+        if (MonstercurrentHP <= 0)
         {
             Die();
         }
@@ -45,20 +45,20 @@ public class MonsterController : MonoBehaviour
 
     public bool IsDead()
     {
-        return currentHP <= 0;
+        return MonstercurrentHP <= 0;
     }
     public int GetATK()
     {
-        return attackPower;
+        return MonsterattackPower;
     }
 
     public int GetCurrentHP()
     {
-        return currentHP;
+        return MonstercurrentHP;
     }
 
     public int GetMaxHP()
     {
-        return maxHP;
+        return MonstermaxHP;
     }
 }
