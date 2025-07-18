@@ -8,11 +8,13 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 5f; // 예시 이동속도
     public float attackRange = 3f; // 예시 공격거리(몬스터와 만나는 거리)
     public float moveDistance = 30f; // 적 처치 후 X축으로 이동할 거리(몬스터 간격)
-    public int attackPower;
+    public int PlayerHP;
+    public int PlayerattackPower;
     public Animator animator;
     public List<Transform> monsters;             // 타겟 몬스터 Transform
     private int currentMonsterIndex = 0; // 현재 타겟 몬스터 인덱스
-    private bool isAttacking = false;
+    private bool isPlayerAttacking = false;
+    private bool isMonsterAttacking = false;
 
     Transform CurrentMonster
     {
@@ -25,6 +27,10 @@ public class PlayerController : MonoBehaviour
     }
     void Start()
     {
+        // 플레이어 스탯 설정
+        PlayerHP = GameManager.Instance.getHP();
+        PlayerattackPower = GameManager.Instance.getATK();
+
         // "Monster" 태그가 붙은 모든 오브젝트의 Transform을 리스트에 저장
         GameObject[] monsterObjects = GameObject.FindGameObjectsWithTag("Monster");
         monsters = new List<Transform>();
@@ -51,13 +57,19 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         MoveForward();
+        // 플레이어가 몬스터를 공격
         if (GameManager.Instance.canPlayerAttack() && GetDistanceToMonster() < attackRange)
         {
-            // 공격
             //animator.SetTrigger("Attack");
-            isAttacking = true;
-            Attack();
+            isPlayerAttacking = true;
+            PlayerAttack();
             GameManager.Instance.PlayerAttack();
+        }
+        // 몬스터가 플레이어를 공격
+        if (GameManager.Instance.canMonsterAttack() && GetDistanceToMonster() < attackRange)
+        {
+            isMonsterAttacking = true;
+            MonsterAttack();
         }
     }
 
@@ -70,15 +82,20 @@ public class PlayerController : MonoBehaviour
     void OnMonsterDie(MonsterController deadMonster)
     {
         currentMonsterIndex++;
-        isAttacking = false;
+        isPlayerAttacking = false;
     }
 
-    
-    void Attack()
+    void MonsterAttack()
+    {
+        MonsterController monsterCtrl = CurrentMonster.GetComponent<MonsterController>();
+        PlayerHP -= monsterCtrl.GetATK();
+        Debug.Log($"몬스터가 플레이어를 공격! 데미지: {monsterCtrl.GetATK()}, 플레이어 남은 체력: {PlayerHP}");
+    }
+    void PlayerAttack()
     {
         // 데미지 계산
-        attackPower = GameManager.Instance.getATK();
-        int damage = attackPower;
+        PlayerattackPower = GameManager.Instance.getATK();
+        int damage = PlayerattackPower;
 
         // 몬스터에 데미지 적용
         MonsterController monsterCtrl = CurrentMonster.GetComponent<MonsterController>();
@@ -99,7 +116,7 @@ public class PlayerController : MonoBehaviour
 
     void MoveForward()
     {
-        if (CurrentMonster == null || isAttacking) return;
+        if (CurrentMonster == null || isPlayerAttacking) return;
 
         float distanceX = GetDistanceToMonster();
         if (distanceX > attackRange)
