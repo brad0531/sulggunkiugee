@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
 using System.Linq;
 using System;
 using System.Data;
 using System.Linq.Expressions;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
@@ -24,6 +26,7 @@ public class GameManager : MonoBehaviour
     private List<double> ATKspeed_levels_lists = new List<double>();
     private List<double> CRIpercent_levels_lists = new List<double>();
     private Dictionary<Tuple<int, int>, Tuple<int, int>> Monster_lists = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
+    private Pair<Tuple<int, bool>, List<Tuple<string, string>>> Scripts = new Pair<Tuple<int, bool>, List<Tuple<string, string>>>(new Tuple<int, bool>(0, true), new List<Tuple<string, string>>());
     #endregion
 
 
@@ -66,8 +69,9 @@ public class GameManager : MonoBehaviour
         UserData.money = 1000000;
         UserData.liver = 0;
         UserData.stage = new Tuple<int, int>(1, 0);
-        Debug.Log("데이터 불러오기");
-        setMonster(new Tuple<int, int>(1, 0));   
+
+        setMonster(new Tuple<int, int>(1, 0));
+
         for (int i = 0; i < 4; i++)
         {
             UserData.status_levels.Add(0);
@@ -337,6 +341,40 @@ public class GameManager : MonoBehaviour
         return 0;
     }
 
+    private int LoadScriptsdatas(int MainStage, bool isStart)
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, $"Monster/Scripts/Boss_Stage{MainStage}_{(isStart ? "Start" : "End")}_script.csv");
+
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"대화 스크립트 CSV 파일을 찾을 수 없습니다: {path}");
+            return 1;
+        }
+
+        Scripts.First = new Tuple<int, bool>(MainStage, isStart);
+        Scripts.Second = new List<Tuple<string, string>>();
+
+        using (StreamReader sr = new StreamReader(path, Encoding.GetEncoding("euc-kr")))
+        {
+            sr.ReadLine(); // 첫 줄은 헤더이므로 건너뜀
+
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                var values = utility.SplitCsvLine(line);
+                if (values.Count >= 3)
+                {
+                    Scripts.Second.Add(new Tuple<string, string>(values[1], values[2]));
+                }
+            }
+        }
+
+        Debug.Log($"대화 스크립트 CSV 로드 완료: {Scripts.Second.Count}개");
+        return 0;
+    }
+
+
+
     #endregion
 
 
@@ -511,7 +549,7 @@ public class GameManager : MonoBehaviour
             Debug.LogError($"monsterDictionary에 해당 키 ({stage.Item1}, {stage.Item2})가 없습니다.");
             return;
         }
-        
+
         if (Monster_lists.TryGetValue(stage, out Tuple<int, int> monsterData))
         {
             UserData.monster.HP = monsterData.Item1;
@@ -595,8 +633,18 @@ public class GameManager : MonoBehaviour
             return false;
         }
     }
-    //AttackSpeed 수치에 대해 공격 가능한 타이밍인지 여부를 반환합니다.(미구현)
-
+    //(player, dialogue)
+    public Tuple<string, string> getScript(int Mainstage, bool isStart, int index)
+    {
+        if (Scripts.First.Item1 != Mainstage || Scripts.First.Item2 != isStart) //새로 불러오기
+        {
+            LoadScriptsdatas(Mainstage, isStart);
+        }
+        if (index >= Scripts.Second.Count)
+            return new Tuple<string, string>("오류 발생:: index 초과", "님 바보에요??");
+        return Scripts.Second[index];
+    }
+    
     #endregion
 
 }
@@ -628,6 +676,43 @@ public class GameUtility
     public long get_times() //utc 시간 (표준 시간)
     {
         return DateTime.UtcNow.Ticks;
+    }
+    public List<string> SplitCsvLine(string line)
+    {
+        List<string> result = new List<string>();
+        bool inQuotes = false;
+        StringBuilder field = new StringBuilder();
+
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+
+            if (c == '"')
+            {
+                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                {
+                    // "" → " 로 처리
+                    field.Append('"');
+                    i++; // skip next quote
+                }
+                else
+                {
+                    inQuotes = !inQuotes;
+                }
+            }
+            else if (c == ',' && !inQuotes)
+            {
+                result.Add(field.ToString());
+                field.Clear();
+            }
+            else
+            {
+                field.Append(c);
+            }
+        }
+
+        result.Add(field.ToString()); // 마지막 필드 추가
+        return result;
     }
 
 }

@@ -4,7 +4,8 @@ public class tester : MonoBehaviour
 {
     void Start()
     {
-        //Debug.Log($"현재 공격력은 {GameManager.Instance.getATK()}");
+        for(int i = 0; i < 10; i++)
+            Debug.Log($"{GameManager.Instance.getScript(1, true, i).Item1}: {GameManager.Instance.getScript(1, true, i).Item2}");
     }
 
 }
