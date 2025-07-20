@@ -7,6 +7,7 @@ using System;
 using System.Data;
 using System.Linq.Expressions;
 using Unity.VisualScripting;
+using UnityEditor.Playables;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class GameManager : MonoBehaviour
     #region 데이터 선언
     private GameUtility utility = new GameUtility();
     public static GameManager Instance { get; private set; }
-    private bool isTesting = true;
+    public bool isTesting = true; //나중에 이거 끄고 키는 것만 하면 로그 출력 제어할 수 있도록
     [Header("CSV 파일 상대 경로 (StreamingAssets 기준)")]
     public string costFileName = "Costs/Cost_CSV.csv"; //코스트 데이터
     public string UserData_FilePath = "UserData/UserData.json";
@@ -27,6 +28,8 @@ public class GameManager : MonoBehaviour
     private List<double> CRIpercent_levels_lists = new List<double>();
     private Dictionary<Tuple<int, int>, Tuple<int, int>> Monster_lists = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
     private Pair<Tuple<int, bool>, List<Tuple<string, string>>> Scripts = new Pair<Tuple<int, bool>, List<Tuple<string, string>>>(new Tuple<int, bool>(0, true), new List<Tuple<string, string>>());
+    private long Last_Save = 0;
+    public long Save_Frequency = 1000000;
     #endregion
 
 
@@ -38,10 +41,22 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject); // 씬 변경에도 유지
             LoadData_all();
+            Last_Save = utility.get_times();
+            if (isTesting)
+                Debug.Log($"자동 세이브 간격은 {Save_Frequency / 10000000.0}초입니다.");
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    public void Update()
+    {
+        if (utility.get_times() - Last_Save >= Save_Frequency)
+        {
+            Last_Save = utility.get_times();
+            SaveUserData();
         }
     }
 
@@ -68,7 +83,7 @@ public class GameManager : MonoBehaviour
         UserData.MaxHP = UserData.HP = LoadHP_Per_Level(0);
         UserData.money = 1000000;
         UserData.liver = 0;
-        UserData.stage = new Tuple<int, int>(1, 0);
+        UserData.stage = new Pair<int, int>(1, 0);
 
         setMonster(new Tuple<int, int>(1, 0));
 
@@ -84,6 +99,8 @@ public class GameManager : MonoBehaviour
     }
     public void SaveUserData()
     {
+        //Debug.Log("유저 데이터 세이브 시도");
+        return;
         string json = JsonUtility.ToJson(this.UserData, true); // true = 보기 좋게 정렬
         string path = Path.Combine(Application.persistentDataPath, UserData_FilePath);
         File.WriteAllText(path, json);
@@ -616,11 +633,11 @@ public class GameManager : MonoBehaviour
     //기타 등등
     public Tuple<int, int> getStage() //현재 플레이어가 어떤 스테이지에 있는지 튜플 형태로 반환합니다.
     {
-        return UserData.stage;
+        return UserData.stage.toTuple();
     }
     public void setStage(Tuple<int, int> stage)
     {
-        UserData.stage = stage;
+        UserData.stage = new Pair<int, int>(stage);
     }
     public bool isVaildStage(Tuple<int, int> stage)
     {
@@ -664,7 +681,7 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public List<int> skill_level = new List<int>();
     public int money, liver; //돈과 간 수치
     public List<int> effects; //버프, 디버프 시간 저장
-    public Tuple<int, int> stage;
+    public Pair<int, int> stage;
     public long last_Attack;
     public Monster monster = new Monster();
 }
