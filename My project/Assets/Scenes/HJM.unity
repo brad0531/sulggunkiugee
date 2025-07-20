@@ -403,7 +403,7 @@ GameObject:
   - component: {fileID: 83275744}
   - component: {fileID: 83275743}
   m_Layer: 5
-  m_Name: HP Panel
+  m_Name: Terra Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -552,9 +552,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 5066707073833446149, guid: 2ef661245da457043a30ea612a3fcccc, type: 3}
+  m_Sprite: {fileID: 8141594849939371527, guid: 59366682c08ff9e4e9f223959af7c898, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -1515,7 +1515,7 @@ GameObject:
   - component: {fileID: 354627572}
   - component: {fileID: 354627571}
   m_Layer: 5
-  m_Name: ATKspeed Panel
+  m_Name: Kelly Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1901,7 +1901,7 @@ GameObject:
   - component: {fileID: 394783784}
   - component: {fileID: 394783783}
   m_Layer: 5
-  m_Name: CritPercent Panel
+  m_Name: ChingTao Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4094,9 +4094,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -7870437291348023706, guid: a92b247bda2b95a45b1c48fc167c4805, type: 3}
+  m_Sprite: {fileID: 7376037026960576149, guid: a4e8a471934757d45bebe220372dfe42, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -4960,7 +4960,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uACF5\uACA9\uC18D\uB3C4"
+  m_Text: "\uCF00\uB9B4"
 --- !u!222 &1109427956
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5485,7 +5485,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uCCB4\uB825"
+  m_Text: "\uD154\uB77C"
 --- !u!222 &1244420638
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6353,9 +6353,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 2562799352991059083, guid: b8888729f2f01b7489577ccc61830835, type: 3}
+  m_Sprite: {fileID: -7158555941686009416, guid: 477f1c6e776acc94abfc1af73b66a81d, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -6619,13 +6619,14 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 40
-    m_Alignment: 7
+    m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: + ?
+  m_Text: "\uACF5\uACA9\uB825 50% \uC0C1\uC2B9(1\uBD84 \uC9C0\uC18D) \n\uAC04\uC218\uCE58
+    + 10"
 --- !u!222 &1561403088
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6904,9 +6905,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 8202158508323460333, guid: ca3c2ddc858fe6c4ba048ba70a94bf1b, type: 3}
+  m_Sprite: {fileID: 2653711321594820323, guid: 0854783ee4ae4414597499379efa5f04, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -7300,7 +7301,7 @@ GameObject:
   - component: {fileID: 1730420364}
   - component: {fileID: 1730420363}
   m_Layer: 5
-  m_Name: ATK Panel
+  m_Name: Cass Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8033,7 +8034,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uACF5\uACA9\uB825"
+  m_Text: "\uCE74\uC2A5"
 --- !u!222 &1823001336
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8650,7 +8651,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uCE58\uBA85\uD0C0\uD655\uB960"
+  m_Text: "\uCE6D\uCE6D\uCE6D"
 --- !u!222 &1995828664
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -101,10 +101,10 @@ public class GameManager : MonoBehaviour
     {
         //Debug.Log("유저 데이터 세이브 시도");
         return;
-        string json = JsonUtility.ToJson(this.UserData, true); // true = 보기 좋게 정렬
-        string path = Path.Combine(Application.persistentDataPath, UserData_FilePath);
-        File.WriteAllText(path, json);
-        Debug.Log("저장 완료: " + path);
+        //string json = JsonUtility.ToJson(this.UserData, true); // true = 보기 좋게 정렬
+        //string path = Path.Combine(Application.persistentDataPath, UserData_FilePath);
+        //File.WriteAllText(path, json);
+        //Debug.Log("저장 완료: " + path);
     }
     private int LoadUserData()
     {
