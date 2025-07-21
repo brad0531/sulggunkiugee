@@ -148,20 +148,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2427917261663764986510a9c8f6ff9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isTesting: 1
   costFileName: Costs/Cost_CSV.csv
   UserData_FilePath: UserData/UserData.json
-  UserData:
-    ATK: 0
-    HP: 0
-    MaxHP: 0
-    ATK_speed: 0
-    CritPercent: 0
-    status_levels: 
-    skill_level: 
-    money: 0
-    liver: 0
-    effects: 
-    last_Attack: 0
+  Save_Frequency: 100000000
 --- !u!4 &759752392
 Transform:
   m_ObjectHideFlags: 0
