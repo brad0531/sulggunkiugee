@@ -39,7 +39,6 @@ public class MonsterController : MonoBehaviour
     private void Die()
     {
         Debug.Log($"[몬스터 사망] 스테이지 {stageNum}-{monsterIndex}");
-        // 이벤트로 플레이어에게 알림
         if (IsMonsterDie != null)
             IsMonsterDie(this);
         Destroy(gameObject);
