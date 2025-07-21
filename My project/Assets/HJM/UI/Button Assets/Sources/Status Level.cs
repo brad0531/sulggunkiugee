@@ -45,6 +45,8 @@ public class StatusLevel : MonoBehaviour
         level++;
 
         GameManager.Instance.setMoney(money);
+        //최대체력 증가량만큼 체력 회복
+        GameManager.Instance.setHP(GameManager.Instance.getHP() + (GameManager.Instance.LoadHP_Per_Level(level) - GameManager.Instance.getCurrentMaxHP()));
         GameManager.Instance.setMaxHP(GameManager.Instance.LoadHP_Per_Level(level));
         GameManager.Instance.UserData.status_levels[1]++; // HP 레벨업
         HP_text.text = $"+ {GameManager.Instance.getCurrentMaxHP()}";

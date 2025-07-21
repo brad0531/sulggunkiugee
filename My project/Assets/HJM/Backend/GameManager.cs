@@ -8,16 +8,14 @@ using System.Data;
 using System.Linq.Expressions;
 using Unity.VisualScripting;
 using UnityEditor.Playables;
-
 public class GameManager : MonoBehaviour
 {
-
+    private const long ONE_SECOND = 10000000;
     #region 데이터 선언
     private GameUtility utility = new GameUtility();
     public static GameManager Instance { get; private set; }
     public bool isTesting = true; //나중에 이거 끄고 키는 것만 하면 로그 출력 제어할 수 있도록
     [Header("CSV 파일 상대 경로 (StreamingAssets 기준)")]
-    public string costFileName = "Costs/Cost_CSV.csv"; //코스트 데이터
     public string UserData_FilePath = "UserData/UserData.json";
     private List<KeyValuePair<string, int>[]> csvData = new List<KeyValuePair<string, int>[]>();
     public List<List<int>> CostData = new List<List<int>>();
@@ -28,8 +26,15 @@ public class GameManager : MonoBehaviour
     private List<double> CRIpercent_levels_lists = new List<double>();
     private Dictionary<Tuple<int, int>, Tuple<int, int>> Monster_lists = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
     private Pair<Tuple<int, bool>, List<Tuple<string, string>>> Scripts = new Pair<Tuple<int, bool>, List<Tuple<string, string>>>(new Tuple<int, bool>(0, true), new List<Tuple<string, string>>());
+    private List<int> Cost_Alcohol;
     private long Last_Save = 0;
     public long Save_Frequency = 1000000;
+
+    public enum Alcohol_index
+    {
+        Cass, Terra, Kelly, ChingTao, Asahi, Ale, LikeFirst, ChamIsle, Saro, Jinro, Red
+    };
+
     #endregion
 
 
@@ -43,7 +48,7 @@ public class GameManager : MonoBehaviour
             LoadData_all();
             Last_Save = utility.get_times();
             if (isTesting)
-                Debug.Log($"자동 세이브 간격은 {Save_Frequency / 10000000.0}초입니다.");
+                Debug.Log($"자동 세이브 간격은 {(double)Save_Frequency / 10000000.0}초입니다.");
         }
         else
         {
@@ -127,7 +132,7 @@ public class GameManager : MonoBehaviour
     }
     private int LoadCost()
     {
-        string path = Path.Combine(Application.streamingAssetsPath, costFileName);
+        string path = Path.Combine(Application.streamingAssetsPath, "Costs/Cost_State.csv");
         if (!File.Exists(path))
         {
             Debug.LogError($"Cost CSV 파일을 찾을 수 없습니다: {path}\n");
@@ -158,7 +163,36 @@ public class GameManager : MonoBehaviour
             }
         }
         if (isTesting)
-            Debug.Log($"CSV 로드 완료: {CostData.Count}줄\n");
+            Debug.Log($"Cost 관련 CSV 로드 완료");
+
+        //술 비용
+        Path.Combine(Application.streamingAssetsPath, "Costs/Cost_Drink.csv");
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"Drink Cost CSV 파일을 찾을 수 없습니다: {path}\n");
+            return 1;
+        }
+        using (StreamReader sr = new StreamReader(path))
+        {
+            sr.ReadLine(); //첫 번째 행 index 패스
+
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                string[] values = line.Split(',');
+                foreach (string obj in values)
+                {
+                    if (!int.TryParse(obj, out int result))
+                    {
+                        // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
+                        continue;
+                    }
+                    Cost_Alcohol.Add(result);
+                }
+            }
+        }
+        if (isTesting)
+            Debug.Log($"Drink Cost 관련 CSV 로드 완료");
         return 0;
     }
     public void ReloadCSV()
@@ -445,6 +479,10 @@ public class GameManager : MonoBehaviour
             return -1;
         return HP_levels_lists[level];
     }
+    public int Load_Alcohol_Cost(Alcohol_index idx)
+    {
+        return Cost_Alcohol[(int)idx];
+    }
     #endregion
 
 
@@ -661,7 +699,11 @@ public class GameManager : MonoBehaviour
             return new Tuple<string, string>("오류 발생:: index 초과", "님 바보에요??");
         return Scripts.Second[index];
     }
-    
+
+    public bool isCoolTimeEnd(Alcohol_index index)
+    {
+        return true;
+    }
     #endregion
 
 }
