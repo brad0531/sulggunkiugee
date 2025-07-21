@@ -35,7 +35,6 @@ public class MonsterController : MonoBehaviour
         {
             Die();
         }
-        //Debug.Log($"[몬스터 피격] 데미지: {damage}, 남은 체력: {currentHP}");
     }
     private void Die()
     {

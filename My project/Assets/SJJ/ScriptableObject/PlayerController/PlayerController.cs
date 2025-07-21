@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public FadeInOut fadeInOut;
+
     public float moveSpeed = 5f; // 예시 이동속도
     public float attackRange = 3f; // 예시 공격거리(몬스터와 만나는 거리)
     public float moveDistance = 30f; // 적 처치 후 X축으로 이동할 거리(몬스터 간격)
@@ -150,6 +152,9 @@ public class PlayerController : MonoBehaviour
         PlayerHP = 0;
         Debug.Log("플레이어가 사망했습니다. 전투를 중지합니다.");
         isPlayerDead = true;
+        // 페이드 인 (미완)
+        if (fadeInOut != null)
+            StartCoroutine(fadeInOut.FadeIn());
     }
     private float GetDistanceToMonster()
     {
