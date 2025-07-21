@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     private int currentMonsterIndex = 0; // 현재 타겟 몬스터 인덱스
     private bool isPlayerAttacking = false;
     private bool isMonsterAttacking = false;
+    private bool isPlayerDead = false;
 
     Transform CurrentMonster
     {
@@ -31,7 +32,7 @@ public class PlayerController : MonoBehaviour
         // 플레이어 스탯 설정
         PlayerHP = GameManager.Instance.getHP();
         PlayerattackPower = GameManager.Instance.getATK();
-        Debug.Log($"플레이어의 공격력을 불러옵니다. 현재 체력은 {PlayerHP}, 공격력은 {PlayerattackPower}입니다.");
+        Debug.Log($"플레이어의 체력과 공격력을 불러옵니다. 현재 체력은 {PlayerHP}, 공격력은 {PlayerattackPower}입니다.");
 
         // "Monster" 태그가 붙은 모든 오브젝트의 Transform을 리스트에 저장
         GameObject[] monsterObjects = GameObject.FindGameObjectsWithTag("Monster");
@@ -60,6 +61,9 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
+        // 사망 판별
+        if (isPlayerDead) return;
+        
         MoveForward();
         // 플레이어가 몬스터를 공격
         if (GameManager.Instance.canPlayerAttack() && GetDistanceToMonster() < attackRange)
@@ -95,6 +99,10 @@ public class PlayerController : MonoBehaviour
         MonsterController monsterCtrl = CurrentMonster.GetComponent<MonsterController>();
         PlayerHP -= monsterCtrl.GetATK();
         Debug.Log($"몬스터가 플레이어를 공격! 데미지: {monsterCtrl.GetATK()}, 플레이어 남은 체력: {PlayerHP}");
+        if (PlayerHP <= 0)
+        {
+            PlayerDie();
+        }
     }
     void PlayerAttack()
     {
@@ -131,6 +139,17 @@ public class PlayerController : MonoBehaviour
             //animator.SetBool("isMoving", true);
         }
         
+    }
+    private void PlayerDie()
+    { 
+        // 중복 실행 방지
+        if (isPlayerDead)
+        {
+            return;
+        }
+        PlayerHP = 0;
+        Debug.Log("플레이어가 사망했습니다. 전투를 중지합니다.");
+        isPlayerDead = true;
     }
     private float GetDistanceToMonster()
     {

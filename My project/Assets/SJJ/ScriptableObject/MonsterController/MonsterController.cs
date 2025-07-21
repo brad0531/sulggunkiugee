@@ -17,10 +17,10 @@ public class MonsterController : MonoBehaviour
     private int MonstercurrentHP;
     private int MonstermaxHP;
     private int MonsterattackPower;
-    void Update()
+    void Start()
     {
         // 몬스터 스탯 세팅
-
+        // 일단 몬스터 스탯을 초기화해야 하긴 하는데, 로그 도배되는 거 같아서 스타트로 해놨어.
         GameManager.Instance.setMonster(new System.Tuple<int, int>(stageNum, monsterIndex));
         MonstermaxHP = GameManager.Instance.getMonsterMaxHP();
         MonstercurrentHP = GameManager.Instance.getMonsterHP();
