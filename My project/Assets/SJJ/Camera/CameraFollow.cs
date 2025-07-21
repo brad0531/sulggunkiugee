@@ -4,19 +4,20 @@ public class CameraFollow : MonoBehaviour
 {
     public Transform target;                        // 따라갈 대상(캐릭터)
     public Vector3 offset = new Vector3(1, 1, -1); // 카메라와 타겟 간 거리
-    public float followSpeed = 20f;                  // 따라가는 속도
-    public float defaultSize = 10f; // 카메라 사이즈 기본값 설정
+    public float followSpeed = 100f;                  // 따라가는 속도
+    public float defaultSize = 50f; // 카메라 사이즈 기본값 설정
 
     private Camera cam;
 
     private void Start()
     {
         Camera.main.targetTexture = null;
+        Awake();
     }
     void Awake()
     {
         cam = GetComponent<Camera>();
-        cam.orthographicSize = defaultSize; // 10f로 카메라 사이즈 변경
+        cam.orthographicSize = defaultSize; // 카메라 사이즈 변경
     }
     void LateUpdate() // 가장 늦게 실행되는 업데이트, 떨림 제거
     {
