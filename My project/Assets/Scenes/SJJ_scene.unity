@@ -233,10 +233,9 @@ GameObject:
   - component: {fileID: 300932607}
   - component: {fileID: 300932606}
   - component: {fileID: 300932609}
-  - component: {fileID: 300932610}
   - component: {fileID: 300932611}
   m_Layer: 0
-  m_Name: Character UI_0
+  m_Name: Plyaer UI_0
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -326,27 +325,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fadeInOut: {fileID: 0}
   moveSpeed: 100
-  attackRange: 3
+  attackRange: 100
   moveDistance: 30
   PlayerHP: 0
   PlayerattackPower: 0
-  animator: {fileID: 0}
+  animator: {fileID: 300932611}
   monsters: []
---- !u!114 &300932610
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 300932605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c2a666c79f24c949a93368ca9bca1a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characterTransform: {fileID: 300932607}
-  moveSpeed: 5
-  Runanimator: {fileID: 300932611}
 --- !u!95 &300932611
 Animator:
   serializedVersion: 7
@@ -357,7 +341,7 @@ Animator:
   m_GameObject: {fileID: 300932605}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 8d71a774c25d7fd47b5858bf189a1f76, type: 2}
+  m_Controller: {fileID: 9100000, guid: dbbad55b17f896946b910177a33d5e96, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

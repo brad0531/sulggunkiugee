@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     public FadeInOut fadeInOut;
 
     public float moveSpeed = 100f; // 예시 이동속도
-    public float attackRange = 3f; // 예시 공격거리(몬스터와 만나는 거리)
+    public float attackRange = 100f; // 예시 공격거리(몬스터와 만나는 거리)
     public float moveDistance = 30f; // 적 처치 후 X축으로 이동할 거리(몬스터 간격)
     public int PlayerHP;
     public int PlayerattackPower;
@@ -117,9 +117,13 @@ public class PlayerController : MonoBehaviour
         {
             // 전진
             transform.position += Vector3.right * moveSpeed * Time.deltaTime;
-            //animator.SetBool("isMoving", true);
+            animator.SetBool("isRunning", true);
         }
-        
+        else
+        {
+            animator.SetBool("isRunning", false);
+            animator.SetTrigger("Attack");
+        }
     }
     private void PlayerDie()
     { 

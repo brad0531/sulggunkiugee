@@ -16,6 +16,7 @@ public class CharacterMover : MonoBehaviour
     }
     void Update()
     {
+        MoveTo(targetPosition);
         if (isMoving)
         {
             MoveCharacter();
