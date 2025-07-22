@@ -12,10 +12,14 @@ public class Alcohol : MonoBehaviour
             return;
 
         if (!GameManager.Instance.isCoolTimeEnd(idx))
+        {
+            Debug.Log("쿨타임 중입니다..");
             return;
+        }
 
         money -= cost;
         GameManager.Instance.setMoney(money);
-        Debug.Log($"구매 :: {money}");
+        GameManager.Instance.effects_on(index);
+        Debug.Log("술 효과 ON");
     }
 }
