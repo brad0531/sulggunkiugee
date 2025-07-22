@@ -8,7 +8,7 @@ public class CharacterMover : MonoBehaviour
     private Vector2 targetPosition = new Vector3(0f, 10f, 0f);
     private bool isMoving = false;
 
-    public Animator animator;
+    public Animator Runanimator;
     void Start()
     {
         characterTransform.position = targetPosition; // 타겟이 되는 포지션으로 이동(지금은 0, 0, 0) 나중에는 시작점
@@ -27,8 +27,8 @@ public class CharacterMover : MonoBehaviour
     {
         targetPosition = newPosition;
         isMoving = true;
-        if (animator != null)
-            animator.SetBool("isMoving", true); // 애니메이션 트리거
+        if (Runanimator != null)
+            Runanimator.SetBool("isMoving", true); // 애니메이션 트리거
     }
 
     private void MoveCharacter()
@@ -40,8 +40,8 @@ public class CharacterMover : MonoBehaviour
         {
             characterTransform.position = targetPosition;
             isMoving = false;
-            if (animator != null)
-                animator.SetBool("isMoving", false); // 정지 애니메이션
+            if (Runanimator != null)
+                Runanimator.SetBool("isMoving", false); // 정지 애니메이션
         }
     }
 }
