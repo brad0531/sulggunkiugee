@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     private List<double> CRIpercent_levels_lists = new List<double>();
     private Dictionary<Tuple<int, int>, Tuple<int, int>> Monster_lists = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
     private Pair<Tuple<int, bool>, List<Tuple<string, string>>> Scripts = new Pair<Tuple<int, bool>, List<Tuple<string, string>>>(new Tuple<int, bool>(0, true), new List<Tuple<string, string>>());
-    private List<int> Cost_Alcohol = new List<int>();
+    private List<List<int>> Info_Alcohol = new List<List<int>>();
     private long Last_Save = 0;
     public long Save_Frequency = 1000000;
 
@@ -76,6 +76,7 @@ public class GameManager : MonoBehaviour
         result += LoadCRIpercentdatas();
         result += LoadHPdatas();
         result += LoadMonsterdatas();
+        //result += Load_Alcohol_Info();
         result += LoadUserData();
         if (result > 0)
             Debug.LogError($"----------------------------------------\n데이터 불러오는 중 오류 발생 :: {result}개\n");
@@ -180,10 +181,46 @@ public class GameManager : MonoBehaviour
         using (StreamReader sr = new StreamReader(path))
         {
             sr.ReadLine(); //첫 번째 행 index 패스
-
+            index = 0;
             while (!sr.EndOfStream)
             {
                 string line = sr.ReadLine();
+                string[] values = line.Split(',');
+                
+                foreach (string obj in values)
+                {
+                    if (!int.TryParse(obj, out int result))
+                    {
+                        // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
+                        continue;
+                    }
+                    Info_Alcohol.Add(new List<int>());
+                    Info_Alcohol[Info_Alcohol.Count - 1].Add(result);
+                }
+            }
+        }
+        if (isTesting)
+            Debug.Log($"Drink Cost 관련 CSV 로드 완료. {Info_Alcohol.Count}개");
+        return 0;
+    }
+
+    private int Load_Alcohol_Info()
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, "Drink.csv");
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"Drink CSV 파일을 찾을 수 없습니다: {path}\n");
+            return 1;
+        }
+        int index = 0;
+        using (StreamReader sr = new StreamReader(path))
+        {
+            Debug.Log(sr.ReadLine());
+             //첫 번째 행 index 패스
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                Debug.Log($"{index} : {line}");
                 string[] values = line.Split(',');
                 foreach (string obj in values)
                 {
@@ -192,14 +229,18 @@ public class GameManager : MonoBehaviour
                         // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
                         continue;
                     }
-                    Cost_Alcohol.Add(result);
+                    Info_Alcohol[index].Add(result);
                 }
+                Debug.Log($"{Info_Alcohol[index][0]} {Info_Alcohol[index][0]} {Info_Alcohol[index][0]} {Info_Alcohol[index][0]} {Info_Alcohol[index][0]}");
+                index++;
             }
         }
         if (isTesting)
-            Debug.Log($"Drink Cost 관련 CSV 로드 완료. {Cost_Alcohol.Count}개");
+            Debug.Log($"Drink info 관련 CSV 로드 완료");
+
         return 0;
     }
+
     public void ReloadCSV()
     {
 
@@ -486,7 +527,7 @@ public class GameManager : MonoBehaviour
     }
     public int Load_Alcohol_Cost(Alcohol_index idx)
     {
-        return Cost_Alcohol[(int)idx];
+        return Info_Alcohol[(int)idx][0];
     }
     #endregion
 
@@ -514,7 +555,19 @@ public class GameManager : MonoBehaviour
     #region 유저 데이터 가져오기
     public int getATK()
     {
-        return UserData.ATK;
+        int current_ATK = getCurrentATK();
+        double Weight = 1.0;
+        if (isEffectsOn(Alcohol_index.Cass))
+            Weight += 0.5;
+        if (isEffectsOn(Alcohol_index.ChingTao))
+            Weight += 2.5;
+
+        current_ATK = (int)((double)current_ATK * Weight);
+
+        if (isEffectsOn(Alcohol_index.Ale))
+            current_ATK = (int)((double)current_ATK * 1.15);
+
+        return current_ATK;
     }
     public int getCurrentATK()
     {
@@ -534,7 +587,10 @@ public class GameManager : MonoBehaviour
     }
     public int getMaxHP()
     {
-        return UserData.MaxHP;
+        int current_MaxHP = getCurrentMaxHP();
+        if (isEffectsOn(Alcohol_index.Terra))
+            current_MaxHP = (int)((double)current_MaxHP * 1.35);
+        return current_MaxHP;
     }
     public int getCurrentMaxHP()
     {
@@ -554,7 +610,15 @@ public class GameManager : MonoBehaviour
     }
     public double getATK_speed()
     {
-        return UserData.ATK_speed;
+        double current_AS = getCurrentATK_speed();
+        double Weight = 1.0;
+
+        if (isEffectsOn(Alcohol_index.Kelly))
+            Weight += 0.2;
+        if (isEffectsOn(Alcohol_index.Asahi))
+            Weight += 1.0;
+
+        return current_AS * Weight;
     }
     public double getCurrentATK_speed()
     {
@@ -680,7 +744,7 @@ public class GameManager : MonoBehaviour
     }
     public void setStage(Tuple<int, int> stage)
     {
-        UserData.stage = new Pair<int, int>(stage);
+        UserData.stage = new Pair<int, int>(stage.Item1, stage.Item2);
     }
     public bool isVaildStage(Tuple<int, int> stage)
     {
@@ -707,10 +771,38 @@ public class GameManager : MonoBehaviour
 
     public bool isCoolTimeEnd(Alcohol_index index)
     {
-        return true;
+        long gap = utility.get_times() - (long)UserData.effects[(int)index];
+        if (gap / ONE_SECOND >= (long)Info_Alcohol[(int)index][3])
+            return true;
+        return false;
     }
-    
-    
+
+    public void effects_on(int index)
+    {
+        UserData.effects[index] = utility.get_times();
+    }
+
+    public bool isEffectsOn(Alcohol_index index)
+    {
+        long gap = utility.get_times() - (long)UserData.effects[(int)index];
+        if (gap / ONE_SECOND >= (long)Info_Alcohol[(int)index][2])
+            return true;
+        return false;
+    }
+
+    public void EarnMoney(int money)
+    {
+        double bonus = 1.0;
+        if (isEffectsOn(Alcohol_index.LikeFirst))
+            bonus += 0.5;
+        if (isEffectsOn(Alcohol_index.Saro))
+            bonus += 1.0;
+        if (isEffectsOn(Alcohol_index.Red))
+            bonus += 3.5;
+
+        money = (int)((double)money * bonus);
+        setMoney(getMoney() + money);
+    }
     #endregion
 
 }
@@ -722,6 +814,7 @@ public class Monster
     public int MaxHP, HP, ATK;
     public long last_Attack;
 }
+[System.Serializable]
 public class UserData_type //세이브 및 로드할 데이터 json형태
 {
     public int ATK, HP, MaxHP;
@@ -729,7 +822,7 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public List<int> status_levels = new List<int>(); //각 스탯 강화 레벨 기록
     public List<int> skill_level = new List<int>();
     public int money, liver; //돈과 간 수치
-    public List<long> effects; //술 버프, 디버프 시간 저장
+    public List<long> effects = new List<long>(); //술 버프, 디버프 시간 저장
     public Pair<int, int> stage;
     public long last_Attack;
     public Monster monster = new Monster();
@@ -783,6 +876,7 @@ public class GameUtility
 
 }
 #endregion
+[System.Serializable]
 public class Pair<T, U>
 {
     public T First { get; set; }
