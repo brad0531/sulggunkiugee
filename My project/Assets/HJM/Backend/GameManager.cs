@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     private List<double> CRIpercent_levels_lists = new List<double>();
     private Dictionary<Tuple<int, int>, Tuple<int, int>> Monster_lists = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
     private Pair<Tuple<int, bool>, List<Tuple<string, string>>> Scripts = new Pair<Tuple<int, bool>, List<Tuple<string, string>>>(new Tuple<int, bool>(0, true), new List<Tuple<string, string>>());
-    private List<int> Cost_Alcohol;
+    private List<int> Cost_Alcohol = new List<int>();
     private long Last_Save = 0;
     public long Save_Frequency = 1000000;
 
@@ -101,6 +101,11 @@ public class GameManager : MonoBehaviour
         {
             UserData.skill_level.Add(0);
         }
+
+        for (int i = 0; i < 11; i++)
+        {
+            UserData.effects.Add(0);
+        }
     }
     public void SaveUserData()
     {
@@ -166,7 +171,7 @@ public class GameManager : MonoBehaviour
             Debug.Log($"Cost 관련 CSV 로드 완료");
 
         //술 비용
-        Path.Combine(Application.streamingAssetsPath, "Costs/Cost_Drink.csv");
+        path = Path.Combine(Application.streamingAssetsPath, "Costs/Cost_Drink.csv");
         if (!File.Exists(path))
         {
             Debug.LogError($"Drink Cost CSV 파일을 찾을 수 없습니다: {path}\n");
@@ -192,7 +197,7 @@ public class GameManager : MonoBehaviour
             }
         }
         if (isTesting)
-            Debug.Log($"Drink Cost 관련 CSV 로드 완료");
+            Debug.Log($"Drink Cost 관련 CSV 로드 완료. {Cost_Alcohol.Count}개");
         return 0;
     }
     public void ReloadCSV()
@@ -704,6 +709,8 @@ public class GameManager : MonoBehaviour
     {
         return true;
     }
+    
+    
     #endregion
 
 }
@@ -722,7 +729,7 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public List<int> status_levels = new List<int>(); //각 스탯 강화 레벨 기록
     public List<int> skill_level = new List<int>();
     public int money, liver; //돈과 간 수치
-    public List<int> effects; //버프, 디버프 시간 저장
+    public List<long> effects; //술 버프, 디버프 시간 저장
     public Pair<int, int> stage;
     public long last_Attack;
     public Monster monster = new Monster();
