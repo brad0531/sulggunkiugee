@@ -16,5 +16,6 @@ public class Alcohol : MonoBehaviour
 
         money -= cost;
         GameManager.Instance.setMoney(money);
+        Debug.Log($"구매 :: {money}");
     }
 }
