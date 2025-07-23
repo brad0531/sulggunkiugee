@@ -135,6 +135,8 @@ public class PlayerController : MonoBehaviour
         PlayerHP = 0;
         Debug.Log("플레이어가 사망했습니다. 전투를 중지합니다.");
         isPlayerDead = true;
+        // 플레이어 사망 애니메이션
+        animator.SetTrigger("Die");
         // 페이드 인 (미완)
         if (fadeInOut != null)
             StartCoroutine(fadeInOut.FadeIn());
