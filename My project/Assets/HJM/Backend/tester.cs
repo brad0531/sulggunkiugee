@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 public class tester : MonoBehaviour
 {
-    public Tuple<int, int> tmp;
+    Tuple<int, int> tmp = new Tuple<int, int>(1, 0);
     void Start()
     {
         GameManager.Instance.setStage(new Tuple<int, int>(0, 0));
