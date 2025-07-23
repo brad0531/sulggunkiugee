@@ -46,7 +46,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0
   m_TransitionOffset: 0
   m_ExitTime: 0.000000010752736
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -135,7 +135,7 @@ AnimatorController:
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
-    m_DefaultBool: 0
+    m_DefaultBool: 1
     m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
@@ -170,7 +170,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0
   m_TransitionOffset: 0.0073147486
   m_ExitTime: 0.006903941
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -189,10 +189,10 @@ AnimatorStateMachine:
     m_Position: {x: 270, y: -50, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -3103886557707461296}
-    m_Position: {x: 490, y: 120, z: 0}
+    m_Position: {x: 780, y: 120, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 3444105928863064818}
-    m_Position: {x: 260, y: 110, z: 0}
+    m_Position: {x: 370, y: 110, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -7411665032235508293}
     m_Position: {x: 500, y: -50, z: 0}
@@ -202,7 +202,7 @@ AnimatorStateMachine:
   m_StateMachineTransitions: {}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 60, y: -130, z: 0}
-  m_EntryPosition: {x: 50, y: 120, z: 0}
+  m_EntryPosition: {x: 80, y: 120, z: 0}
   m_ExitPosition: {x: 60, y: -20, z: 0}
   m_ParentStateMachinePosition: {x: 630, y: 270, z: 0}
   m_DefaultState: {fileID: 3444105928863064818}
@@ -214,7 +214,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Idle
-  m_Speed: 0.33
+  m_Speed: 0.5
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 871254419315846456}
