@@ -76,7 +76,7 @@ public class GameManager : MonoBehaviour
         result += LoadCRIpercentdatas();
         result += LoadHPdatas();
         result += LoadMonsterdatas();
-        //result += Load_Alcohol_Info();
+        result += Load_Alcohol_Info();
         result += LoadUserData();
         if (result > 0)
             Debug.LogError($"----------------------------------------\n데이터 불러오는 중 오류 발생 :: {result}개\n");
@@ -231,7 +231,7 @@ public class GameManager : MonoBehaviour
                     }
                     Info_Alcohol[index].Add(result);
                 }
-                Debug.Log($"{Info_Alcohol[index][0]} {Info_Alcohol[index][0]} {Info_Alcohol[index][0]} {Info_Alcohol[index][0]} {Info_Alcohol[index][0]}");
+                Debug.Log($"{Info_Alcohol[index][0]} {Info_Alcohol[index][1]} {Info_Alcohol[index][2]} {Info_Alcohol[index][3]} {Info_Alcohol[index][4]}");
                 index++;
             }
         }
