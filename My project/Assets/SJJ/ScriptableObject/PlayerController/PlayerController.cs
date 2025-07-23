@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
         PlayerHP = GameManager.Instance.getHP();
         PlayerattackPower = GameManager.Instance.getATK();
         Debug.Log($"플레이어의 체력과 공격력을 불러옵니다. 현재 체력은 {PlayerHP}, 공격력은 {PlayerattackPower}입니다.");
+        // 몬스터 할당
         RegisterMonsters();
     }
     void Update()
@@ -143,7 +144,14 @@ public class PlayerController : MonoBehaviour
     }
     private float GetDistanceToMonster()
     {
-        return Mathf.Abs(CurrentMonster.position.x - transform.position.x);
+        // 버그가 나서 막아뒀어요
+        if (CurrentMonster != null)
+            return Mathf.Abs(CurrentMonster.position.x - transform.position.x);
+        else
+        {
+            return float.MaxValue;
+        }
+           
     }
 
     private void RegisterMonsters()
@@ -191,10 +199,8 @@ public class PlayerController : MonoBehaviour
 
             monsterIndex++;
         }
-
         // 몬스터 사망 이벤트 구독 추가
         MonsterController.IsMonsterDie -= OnMonsterDie;
         MonsterController.IsMonsterDie += OnMonsterDie;
     }
-
 }

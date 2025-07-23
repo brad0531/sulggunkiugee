@@ -29,7 +29,7 @@ public class CharacterMover : MonoBehaviour
         targetPosition = newPosition;
         isMoving = true;
         if (Runanimator != null)
-            Runanimator.SetBool("isMoving", true); // 애니메이션 트리거
+            Runanimator.SetBool("isRunning", true); // 애니메이션 트리거
     }
 
     private void MoveCharacter()
@@ -42,7 +42,7 @@ public class CharacterMover : MonoBehaviour
             characterTransform.position = targetPosition;
             isMoving = false;
             if (Runanimator != null)
-                Runanimator.SetBool("isMoving", false); // 정지 애니메이션
+                Runanimator.SetBool("isRunning", false); // 정지 애니메이션
         }
     }
 }
