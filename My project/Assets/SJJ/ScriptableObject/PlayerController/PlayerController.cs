@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework.Internal;
@@ -9,7 +10,7 @@ public class PlayerController : MonoBehaviour
     public FadeInOut fadeInOut;
 
     public float moveSpeed = 100f; // 예시 이동속도
-    public float attackRange = 100f; // 예시 공격거리(몬스터와 만나는 거리)
+    public float attackRange = 150f; // 예시 공격거리(몬스터와 만나는 거리)
     public float moveDistance = 30f; // 적 처치 후 X축으로 이동할 거리(몬스터 간격)
     public int PlayerHP;
     public int PlayerattackPower;
@@ -47,11 +48,11 @@ public class PlayerController : MonoBehaviour
         // 플레이어가 몬스터를 공격
         if (GameManager.Instance.canPlayerAttack() && GetDistanceToMonster() < attackRange)
         {
-            //animator.SetTrigger("Attack");
             isPlayerAttacking = true;
-            PlayerAttack();
+            StartCoroutine(DoAttack());
             GameManager.Instance.PlayerAttack();
         }
+
         // 몬스터가 플레이어를 공격
         if (GameManager.Instance.canMonsterAttack() && GetDistanceToMonster() < attackRange)
         {
@@ -69,7 +70,6 @@ public class PlayerController : MonoBehaviour
 
     void OnMonsterDie(MonsterController deadMonster)
     {
-        currentMonsterIndex++;
         isPlayerAttacking = false;
     }
 
@@ -93,37 +93,38 @@ public class PlayerController : MonoBehaviour
         
         int damage = PlayerattackPower;
 
+        // 공격 애니메이션
+        animator.SetTrigger("Attack");
         // 몬스터에 데미지 적용
         MonsterController monsterCtrl = CurrentMonster.GetComponent<MonsterController>();
         if (monsterCtrl != null && !monsterCtrl.IsDead())
         {
             monsterCtrl.MonsterTakeDamage(damage);
         }
-        // 공격 애니메이션 실행
-        if (animator != null)
-        {
-            animator.SetTrigger("Attack");
-        }
-
-        // 콘솔에 데미지 결과 출력
         Debug.Log($"플레이어가 몬스터를 공격! 데미지: {damage}, 몬스터 남은 체력: {monsterCtrl.GetCurrentHP()}");
     }
-
+    IEnumerator DoAttack()
+    {
+        isPlayerAttacking = true;
+        animator.SetTrigger("Attack");
+        yield return new WaitForSeconds(1.0f);
+        PlayerAttack();
+        isPlayerAttacking= false;
+    }
     void MoveForward()
     {
         if (CurrentMonster == null || isPlayerAttacking) return;
 
         float distanceX = GetDistanceToMonster();
-        if (distanceX > attackRange)
+        if (distanceX >= attackRange)
         {
             // 전진
-            transform.position += Vector3.right * moveSpeed * Time.deltaTime;
             animator.SetBool("isRunning", true);
+            transform.position += Vector3.right * moveSpeed * Time.deltaTime;
         }
         else
         {
             animator.SetBool("isRunning", false);
-            animator.SetTrigger("Attack");
         }
     }
     private void PlayerDie()
@@ -144,14 +145,14 @@ public class PlayerController : MonoBehaviour
     }
     private float GetDistanceToMonster()
     {
-        // 버그가 나서 막아뒀어요
-        if (CurrentMonster != null)
-            return Mathf.Abs(CurrentMonster.position.x - transform.position.x);
-        else
-        {
+        if (CurrentMonster == null)
             return float.MaxValue;
-        }
-           
+
+        MonsterController mc = CurrentMonster.GetComponent<MonsterController>();
+        if (mc == null || mc.IsDead())
+            return float.MaxValue;
+
+        return Mathf.Abs(CurrentMonster.position.x - transform.position.x);
     }
 
     private void RegisterMonsters()
@@ -196,11 +197,19 @@ public class PlayerController : MonoBehaviour
 
                 Debug.Log($"[몬스터 등록] 이름: {obj.name}, 스테이지: {stageNum}, 인덱스: {monsterIndex}, X: {obj.transform.position.x}");
             }
-
             monsterIndex++;
         }
         // 몬스터 사망 이벤트 구독 추가
         MonsterController.IsMonsterDie -= OnMonsterDie;
         MonsterController.IsMonsterDie += OnMonsterDie;
+
+        MonsterController.OnMonsterCompletelyDestroyed -= OnMonsterDestroyed;
+        MonsterController.OnMonsterCompletelyDestroyed += OnMonsterDestroyed;
+    }
+    void OnMonsterDestroyed(MonsterController deadMonster)
+    {
+        Debug.Log("몬스터 제거됨");
+        currentMonsterIndex++;
+        isPlayerAttacking = false;
     }
 }

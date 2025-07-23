@@ -1,14 +1,17 @@
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using UnityEditor.EditorTools;
 using UnityEngine;
+using System.Collections;
+
 
 public class MonsterController : MonoBehaviour
 {
     public delegate void MonsterDieEvent(MonsterController monster);
     public static event MonsterDieEvent IsMonsterDie;
-
+    public static event Action<MonsterController> OnMonsterCompletelyDestroyed;
     [Header("몬스터 식별 정보")]
     public int stageNum = 1;     // 스테이지 번호 (예: 1)
     public int monsterIndex = 0; // 몬스터 인덱스
@@ -41,7 +44,17 @@ public class MonsterController : MonoBehaviour
         Debug.Log($"[몬스터 사망] 스테이지 {stageNum}-{monsterIndex}");
         if (IsMonsterDie != null)
             IsMonsterDie(this);
+        // 1초 지연
+        StartCoroutine(DelayedDestory(1.0f));
+    }
+    private IEnumerator DelayedDestory(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (OnMonsterCompletelyDestroyed != null)
+            OnMonsterCompletelyDestroyed(this);
+
         Destroy(gameObject);
+
     }
 
     public bool IsDead()

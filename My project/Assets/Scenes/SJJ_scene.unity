@@ -346,8 +346,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeInOut: {fileID: 0}
-  moveSpeed: 100
-  attackRange: 100
+  moveSpeed: 200
+  attackRange: 150
   moveDistance: 30
   PlayerHP: 0
   PlayerattackPower: 0
