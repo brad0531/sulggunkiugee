@@ -26,7 +26,8 @@ public class GameManager : MonoBehaviour
     private List<double> CRIpercent_levels_lists = new List<double>();
     private Dictionary<Tuple<int, int>, Tuple<int, int>> Monster_lists = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
     private Pair<Tuple<int, bool>, List<Tuple<string, string>>> Scripts = new Pair<Tuple<int, bool>, List<Tuple<string, string>>>(new Tuple<int, bool>(0, true), new List<Tuple<string, string>>());
-    private List<List<int>> Info_Alcohol = new List<List<int>>();
+    public List<List<int>> Info_Alcohol = new List<List<int>>();
+    public List<List<int>> Snacks = new List<List<int>>();
     private long Last_Save = 0;
     public long Save_Frequency = 1000000;
 
@@ -77,6 +78,7 @@ public class GameManager : MonoBehaviour
         result += LoadHPdatas();
         result += LoadMonsterdatas();
         result += Load_Alcohol_Info();
+        result += Load_Snacks_Data();
         result += LoadUserData();
         if (result > 0)
             Debug.LogError($"----------------------------------------\n데이터 불러오는 중 오류 발생 :: {result}개\n");
@@ -237,6 +239,77 @@ public class GameManager : MonoBehaviour
         }
         if (isTesting)
             Debug.Log($"Drink info 관련 CSV 로드 완료");
+
+        return 0;
+    }
+
+    private int Load_Snacks_Data()
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, "Costs/Cost_Snack.csv");
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"Snack Cost CSV 파일을 찾을 수 없습니다: {path}\n");
+            return 1;
+        }
+        int index;
+        using (StreamReader sr = new StreamReader(path))
+        {
+            sr.ReadLine(); //첫 번째 행 index 패스
+            index = 0;
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                string[] values = line.Split(',');
+
+                foreach (string obj in values)
+                {
+                    if (!int.TryParse(obj, out int result))
+                    {
+                        // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
+                        continue;
+                    }
+                    Info_Alcohol.Add(new List<int>());
+                    Info_Alcohol[Info_Alcohol.Count - 1].Add(result);
+                }
+            }
+        }
+        if (isTesting)
+            Debug.Log($"Drink Cost 관련 CSV 로드 완료. {Info_Alcohol.Count}개");
+
+        path = Path.Combine(Application.streamingAssetsPath, "Snack.csv");
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"Snack CSV 파일을 찾을 수 없습니다: {path}\n");
+            return 1;
+        }
+
+        Snacks.Clear();
+        index = 0;
+        using (StreamReader sr = new StreamReader(path))
+        {
+            sr.ReadLine(); //첫 번째 행 index 패스
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                string[] values = line.Split(',');
+                foreach (string obj in values)
+                {
+                    if (!int.TryParse(obj, out int result))
+                    {
+                        // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
+                        continue;
+                    }
+                    Snacks[index].Add(result);
+                }
+
+                index++;
+            }
+        }
+
+        
+
+        if (isTesting)
+            Debug.Log($"Snack 관련 CSV 로드 완료");
 
         return 0;
     }
@@ -654,7 +727,7 @@ public class GameManager : MonoBehaviour
     }
     public void setLiver(int liver)
     {
-        UserData.liver = liver;
+        UserData.liver = Math.Max(0, liver);
     }
     #endregion
 
@@ -769,7 +842,15 @@ public class GameManager : MonoBehaviour
         return Scripts.Second[index];
     }
 
-    public bool isCoolTimeEnd(Alcohol_index index)
+    public bool isAlcoholCoolTimeEnd(Alcohol_index index)
+    {
+        long gap = utility.get_times() - (long)UserData.effects[(int)index];
+        if (gap / ONE_SECOND >= (long)Info_Alcohol[(int)index][3])
+            return true;
+        return false;
+    }
+
+    public bool isSnackCoolTimeEnd(int index)
     {
         long gap = utility.get_times() - (long)UserData.effects[(int)index];
         if (gap / ONE_SECOND >= (long)Info_Alcohol[(int)index][3])
@@ -798,7 +879,7 @@ public class GameManager : MonoBehaviour
         if (isEffectsOn(Alcohol_index.Saro))
             bonus += 1.0;
         if (isEffectsOn(Alcohol_index.Red))
-            bonus += 3.5;
+            bonus += 2.5;
 
         money = (int)((double)money * bonus);
         setMoney(getMoney() + money);
