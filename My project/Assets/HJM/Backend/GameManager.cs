@@ -657,7 +657,7 @@ public class GameManager : MonoBehaviour
     }
     public int getHP()
     {
-        return UserData.HP;
+        return Math.Min(UserData.HP, getMaxHP());
     }
     public int getMaxHP()
     {
@@ -672,7 +672,7 @@ public class GameManager : MonoBehaviour
     }
     public int getCurrentHP()
     {
-        return UserData.HP;
+        return Math.Min(UserData.HP, getMaxHP());
     }
     public double getCritPercent()
     {
@@ -1002,3 +1002,4 @@ public class Pair<T, U>
         return HashCode.Combine(hash1, hash2); // .NET Core 2.1+ / .NET Standard 2.1+ / .NET Framework 4.7.2+
     }
 }
+
