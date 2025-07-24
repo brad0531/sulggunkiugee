@@ -292,6 +292,7 @@ public class GameManager : MonoBehaviour
             {
                 string line = sr.ReadLine();
                 string[] values = line.Split(',');
+                Snacks.Add(new List<int>());
                 foreach (string obj in values)
                 {
                     if (!int.TryParse(obj, out int result))
