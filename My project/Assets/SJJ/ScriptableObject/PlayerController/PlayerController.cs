@@ -238,5 +238,6 @@ public class PlayerController : MonoBehaviour
         if (fadeInOut != null)
             StartCoroutine(fadeInOut.FadeIn());
     }
+
     #endregion
 }
