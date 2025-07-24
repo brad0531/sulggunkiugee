@@ -44,8 +44,8 @@ public class MonsterController : MonoBehaviour
         Debug.Log($"[몬스터 사망] 스테이지 {stageNum}-{monsterIndex}");
         if (IsMonsterDie != null)
             IsMonsterDie(this);
-        // 1초 지연
-        StartCoroutine(DelayedDestory(1.0f));
+        // 0.5초 지연
+        StartCoroutine(DelayedDestory(0.5f));
     }
     private IEnumerator DelayedDestory(float delay)
     {
@@ -54,9 +54,7 @@ public class MonsterController : MonoBehaviour
             OnMonsterCompletelyDestroyed(this);
 
         Destroy(gameObject);
-
     }
-
     public bool IsDead()
     {
         return MonstercurrentHP <= 0;

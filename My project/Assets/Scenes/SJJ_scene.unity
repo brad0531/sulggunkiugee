@@ -345,13 +345,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0f485cdc41b880468e689b9b7f3db1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInOut: {fileID: 0}
-  moveSpeed: 200
-  attackRange: 150
-  moveDistance: 30
-  PlayerHP: 0
-  PlayerattackPower: 0
+  moveSpeed: 500
+  attackRange: 200
+  moveDistanceAfterKill: 30
   animator: {fileID: 300932611}
+  fadeInOut: {fileID: 0}
   monsters:
   - {fileID: 1333873544}
   - {fileID: 1851535326}
