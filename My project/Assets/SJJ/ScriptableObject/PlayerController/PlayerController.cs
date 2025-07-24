@@ -1,215 +1,242 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
-using NUnit.Framework.Internal;
 using UnityEngine;
 
+/// <summary>
+/// Handles player movement, attacking, and interactions with monsters.
+/// </summary>
+[RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour
 {
-    public FadeInOut fadeInOut;
+    #region Inspector Fields
+    [Header("플레이어 스탯")]
+    [SerializeField, Min(0f)] private float moveSpeed = 100f;
+    [SerializeField, Min(0f)] private float attackRange = 150f;
+    [SerializeField, Min(0f)] private float moveDistanceAfterKill = 30f;
 
-    public float moveSpeed = 100f; // 예시 이동속도
-    public float attackRange = 150f; // 예시 공격거리(몬스터와 만나는 거리)
-    public float moveDistance = 30f; // 적 처치 후 X축으로 이동할 거리(몬스터 간격)
-    public int PlayerHP;
-    public int PlayerattackPower;
-    public Animator animator;
-    public List<Transform> monsters;             // 타겟 몬스터 Transform
-    private int currentMonsterIndex = 0; // 현재 타겟 몬스터 인덱스
-    private bool isPlayerAttacking = false;
-    private bool isMonsterAttacking = false;
-    private bool isPlayerDead = false;
+    [Header("애니메이터")]
+    [SerializeField] private Animator animator;
 
-    Transform CurrentMonster
+    [Header("이펙트 & UI")]
+    [SerializeField] private FadeInOut fadeInOut;
+
+    [Header("몬스터 설정")]
+    [SerializeField] private List<Transform> monsters = new List<Transform>();
+    #endregion
+
+    #region Private Fields
+    private int _playerHP;
+    private int _playerAttackPower;
+    private int _currentMonsterIndex;
+
+    private bool _isPlayerAttacking;
+    private bool _isMonsterAttacking;
+    private bool _isPlayerDead;
+    #endregion
+
+    #region Properties
+    private Transform CurrentMonster
     {
         get
         {
-            if (monsters == null || monsters.Count == 0) return null;
-            if (currentMonsterIndex >= monsters.Count) return null;
-            return monsters[currentMonsterIndex];
+            if (_currentMonsterIndex < 0 || _currentMonsterIndex >= monsters.Count)
+                return null;
+            return monsters[_currentMonsterIndex];
         }
     }
-    void Start()
+    #endregion
+
+    #region Unity Callbacks
+    private void Start()
     {
-        // 플레이어 스탯 설정
-        PlayerHP = GameManager.Instance.getHP();
-        PlayerattackPower = GameManager.Instance.getATK();
-        Debug.Log($"플레이어의 체력과 공격력을 불러옵니다. 현재 체력은 {PlayerHP}, 공격력은 {PlayerattackPower}입니다.");
-        // 몬스터 할당
+        InitializePlayerStats();
         RegisterMonsters();
     }
-    void Update()
-    {
-        // 사망 판별
-        if (isPlayerDead) return;
-        
-        MoveForward();
-        // 플레이어가 몬스터를 공격
-        if (GameManager.Instance.canPlayerAttack() && GetDistanceToMonster() < attackRange)
-        {
-            isPlayerAttacking = true;
-            StartCoroutine(DoAttack());
-            GameManager.Instance.PlayerAttack();
-        }
 
-        // 몬스터가 플레이어를 공격
-        if (GameManager.Instance.canMonsterAttack() && GetDistanceToMonster() < attackRange)
-        {
-            isMonsterAttacking = true;
-            MonsterAttack();
-            GameManager.Instance.MonsterAttack();
-        }
-    }
-
-    void OnDestroy()
+    private void Update()
     {
-        // 이벤트 구독 해제
-        MonsterController.IsMonsterDie -= OnMonsterDie;
-    }
-
-    void OnMonsterDie(MonsterController deadMonster)
-    {
-        isPlayerAttacking = false;
-    }
-
-    void MonsterAttack()
-    {
-        MonsterController monsterCtrl = CurrentMonster.GetComponent<MonsterController>();
-        PlayerHP = GameManager.Instance.getHP();
-        // 유저가 강화하는 걸 대비, HP 설정 후 뎀지 계산
-        PlayerHP -= monsterCtrl.GetATK();
-        Debug.Log($"몬스터가 플레이어를 공격! 데미지: {monsterCtrl.GetATK()}, 플레이어 남은 체력: {PlayerHP}");
-        if (PlayerHP <= 0)
-        {
-            PlayerDie();
-        }
-        GameManager.Instance.setHP(PlayerHP);
-    }
-    void PlayerAttack()
-    {
-        // 데미지 계산
-        PlayerattackPower = GameManager.Instance.getATK();
-        
-        int damage = PlayerattackPower;
-
-        // 공격 애니메이션
-        animator.SetTrigger("Attack");
-        // 몬스터에 데미지 적용
-        MonsterController monsterCtrl = CurrentMonster.GetComponent<MonsterController>();
-        if (monsterCtrl != null && !monsterCtrl.IsDead())
-        {
-            monsterCtrl.MonsterTakeDamage(damage);
-        }
-        Debug.Log($"플레이어가 몬스터를 공격! 데미지: {damage}, 몬스터 남은 체력: {monsterCtrl.GetCurrentHP()}");
-    }
-    IEnumerator DoAttack()
-    {
-        isPlayerAttacking = true;
-        animator.SetTrigger("Attack");
-        yield return new WaitForSeconds(1.0f);
-        PlayerAttack();
-        isPlayerAttacking= false;
-    }
-    void MoveForward()
-    {
-        if (CurrentMonster == null || isPlayerAttacking) return;
-
-        float distanceX = GetDistanceToMonster();
-        if (distanceX >= attackRange)
-        {
-            // 전진
-            animator.SetBool("isRunning", true);
-            transform.position += Vector3.right * moveSpeed * Time.deltaTime;
-        }
-        else
-        {
-            animator.SetBool("isRunning", false);
-        }
-    }
-    private void PlayerDie()
-    { 
-        // 중복 실행 방지
-        if (isPlayerDead)
-        {
+        if (_isPlayerDead)
             return;
-        }
-        PlayerHP = 0;
-        Debug.Log("플레이어가 사망했습니다. 전투를 중지합니다.");
-        isPlayerDead = true;
-        // 플레이어 사망 애니메이션
-        animator.SetTrigger("Die");
-        // 페이드 인 (미완)
-        if (fadeInOut != null)
-            StartCoroutine(fadeInOut.FadeIn());
+
+        if (!_isPlayerAttacking)
+            HandleMovement();
+
+        TryPlayerAttack();
+        TryMonsterAttack();
     }
-    private float GetDistanceToMonster()
+
+    private void OnDestroy()
     {
-        if (CurrentMonster == null)
-            return float.MaxValue;
+        MonsterController.IsMonsterDie -= OnMonsterDie;
+        MonsterController.OnMonsterCompletelyDestroyed -= OnMonsterDestroyed;
+    }
+    #endregion
 
-        MonsterController mc = CurrentMonster.GetComponent<MonsterController>();
-        if (mc == null || mc.IsDead())
-            return float.MaxValue;
-
-        return Mathf.Abs(CurrentMonster.position.x - transform.position.x);
+    #region Initialization
+    private void InitializePlayerStats()
+    {
+        _playerHP = GameManager.Instance.getHP();
+        _playerAttackPower = GameManager.Instance.getATK();
+        Debug.Log($"[Player Stats] HP={_playerHP}, ATK={_playerAttackPower}");
     }
 
     private void RegisterMonsters()
     {
-        // 현재 스테이지 번호 가져오기
-        int stageNum = GameManager.Instance.getStage().Item1;
-        int monsterIndex = 0;
+        var stageInfo = GameManager.Instance.getStage();
+        int stageNum = stageInfo.Item1;
+        int monsterIdx = 0;
 
-        // "Monster" 태그를 가진 모든 오브젝트 가져오기
-        GameObject[] monsterObjects = GameObject.FindGameObjectsWithTag("Monster");
-        monsters = new List<Transform>();
+        var allMonsters = GameObject.FindGameObjectsWithTag("Monster");
+        Array.Sort(allMonsters, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
 
-        // X좌표 기준 오름차순 정렬
-        System.Array.Sort(monsterObjects, (a, b) =>
-            a.transform.position.x.CompareTo(b.transform.position.x)
-        );
-
-        for (int i = 0; i < monsterObjects.Length; i++)
+        monsters.Clear();
+        foreach (var monsterObj in allMonsters)
         {
-            // 유효한 (stageNum, monsterIndex)를 찾을 때까지 다음 스테이지로 넘김
-            while (!GameManager.Instance.isVaildStage(new Tuple<int, int>(stageNum, monsterIndex)))
+            while (!GameManager.Instance.isVaildStage(new Tuple<int, int>(stageNum, monsterIdx)))
             {
                 stageNum++;
-                monsterIndex = 0;
-
-                // 스킵
-                if (!GameManager.Instance.isVaildStage(new Tuple<int, int>(stageNum, monsterIndex)))
+                monsterIdx = 0;
+                if (!GameManager.Instance.isVaildStage(new Tuple<int, int>(stageNum, monsterIdx)))
                 {
-                    Debug.LogWarning($"[스테이지 등록 실패] (stage: {stageNum}, index: {monsterIndex})는 유효하지 않은 몬스터 데이터입니다.");
-                    return; 
+                    Debug.LogWarning($"[Stage Load Failed] stage={stageNum}, index={monsterIdx}");
+                    return;
                 }
             }
 
-            GameObject obj = monsterObjects[i];
-            monsters.Add(obj.transform);
-
-            MonsterController mc = obj.GetComponent<MonsterController>();
-            if (mc != null)
+            monsters.Add(monsterObj.transform);
+            var ctrl = monsterObj.GetComponent<MonsterController>();
+            if (ctrl != null)
             {
-                mc.stageNum = stageNum;
-                mc.monsterIndex = monsterIndex;
-
-                Debug.Log($"[몬스터 등록] 이름: {obj.name}, 스테이지: {stageNum}, 인덱스: {monsterIndex}, X: {obj.transform.position.x}");
+                ctrl.stageNum = stageNum;
+                ctrl.monsterIndex = monsterIdx;
+                Debug.Log($"[Monster Registered] {monsterObj.name} at Stage {stageNum}, Index {monsterIdx}");
             }
-            monsterIndex++;
+            monsterIdx++;
         }
-        // 몬스터 사망 이벤트 구독 추가
-        MonsterController.IsMonsterDie -= OnMonsterDie;
-        MonsterController.IsMonsterDie += OnMonsterDie;
 
-        MonsterController.OnMonsterCompletelyDestroyed -= OnMonsterDestroyed;
+        MonsterController.IsMonsterDie += OnMonsterDie;
         MonsterController.OnMonsterCompletelyDestroyed += OnMonsterDestroyed;
     }
-    void OnMonsterDestroyed(MonsterController deadMonster)
+    #endregion
+
+    #region Movement & Attacks
+    private void HandleMovement()
     {
-        Debug.Log("몬스터 제거됨");
-        currentMonsterIndex++;
-        isPlayerAttacking = false;
+        if (CurrentMonster == null)
+        {
+            animator.SetBool("isRunning", false);
+            return;
+        }
+
+        float distance = Vector3.Distance(CurrentMonster.position, transform.position);
+        bool shouldRun = distance >= attackRange;
+        animator.SetBool("isRunning", shouldRun);
+
+        if (shouldRun)
+            transform.Translate(Vector3.right * (moveSpeed * Time.deltaTime));
     }
+
+    private void TryPlayerAttack()
+    {
+        if (_isPlayerAttacking || CurrentMonster == null) return;
+
+        float distance = Vector3.Distance(CurrentMonster.position, transform.position);
+        if (!GameManager.Instance.canPlayerAttack() || distance > attackRange)
+            return;
+
+        StartCoroutine(PlayerAttackSequence());
+    }
+
+    private IEnumerator PlayerAttackSequence()
+    {
+        _isPlayerAttacking = true;
+        animator.SetBool("isRunning", false);
+        animator.SetTrigger("Attack");
+
+        yield return new WaitForSeconds(GetAnimationLength("Attack"));
+        ApplyPlayerDamage();
+
+        transform.Translate(Vector3.right * moveDistanceAfterKill);
+        _isPlayerAttacking = false;
+    }
+
+    private void ApplyPlayerDamage()
+    {
+        _playerAttackPower = GameManager.Instance.getATK();
+        int damage = _playerAttackPower;
+
+        var ctrl = CurrentMonster.GetComponent<MonsterController>();
+        if (ctrl != null && !ctrl.IsDead())
+        {
+            ctrl.MonsterTakeDamage(damage);
+            Debug.Log($"[Player Attack] Damage={damage}, Monster HP={ctrl.GetCurrentHP()}");
+        }
+        GameManager.Instance.PlayerAttack();
+    }
+
+    private void TryMonsterAttack()
+    {
+        if (_isMonsterAttacking || CurrentMonster == null) return;
+
+        float distance = Vector3.Distance(CurrentMonster.position, transform.position);
+        if (!GameManager.Instance.canMonsterAttack() || distance > attackRange)
+            return;
+
+        StartCoroutine(MonsterAttackSequence());
+    }
+
+    private IEnumerator MonsterAttackSequence()
+    {
+        _isMonsterAttacking = true;
+        yield return new WaitForSeconds(0.5f);
+
+        var ctrl = CurrentMonster.GetComponent<MonsterController>();
+        if (ctrl != null && !ctrl.IsDead())
+        {
+            _playerHP = GameManager.Instance.getHP() - ctrl.GetATK();
+            GameManager.Instance.setHP(_playerHP);
+            Debug.Log($"[Monster Attack] Damage={ctrl.GetATK()}, Player HP={_playerHP}");
+
+            if (_playerHP <= 0)
+                HandlePlayerDeath();
+        }
+
+        GameManager.Instance.MonsterAttack();
+        _isMonsterAttacking = false;
+    }
+    #endregion
+
+    #region Utilities & Events
+    private float GetAnimationLength(string animName)
+    {
+        foreach (var clip in animator.runtimeAnimatorController.animationClips)
+            if (clip.name == animName)
+                return clip.length;
+        return 1f;
+    }
+
+    private void OnMonsterDie(MonsterController dead)
+    {
+        _isPlayerAttacking = false;
+    }
+
+    private void OnMonsterDestroyed(MonsterController dead)
+    {
+        _currentMonsterIndex++;
+        _isPlayerAttacking = false;
+    }
+
+    private void HandlePlayerDeath()
+    {
+        if (_isPlayerDead) return;
+
+        _isPlayerDead = true;
+        animator.SetTrigger("Die");
+        Debug.Log("[Player Died]");
+
+        if (fadeInOut != null)
+            StartCoroutine(fadeInOut.FadeIn());
+    }
+    #endregion
 }
