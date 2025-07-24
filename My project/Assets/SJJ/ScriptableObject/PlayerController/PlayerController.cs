@@ -11,8 +11,8 @@ public class PlayerController : MonoBehaviour
 {
     #region Inspector Fields
     [Header("플레이어 스탯")]
-    [SerializeField, Min(0f)] private float moveSpeed = 100f;
-    [SerializeField, Min(0f)] private float attackRange = 150f;
+    [SerializeField, Min(0f)] private float moveSpeed = 500f;
+    [SerializeField, Min(0f)] private float attackRange = 200f;
     [SerializeField, Min(0f)] private float moveDistanceAfterKill = 30f;
 
     [Header("애니메이터")]
@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
     private int _playerHP;
     private int _playerAttackPower;
     private int _currentMonsterIndex;
+    private Vector3 respawnPosition;
 
     private bool _isPlayerAttacking;
     private bool _isMonsterAttacking;
@@ -79,6 +80,9 @@ public class PlayerController : MonoBehaviour
         _playerHP = GameManager.Instance.getHP();
         _playerAttackPower = GameManager.Instance.getATK();
         Debug.Log($"[Player Stats] HP={_playerHP}, ATK={_playerAttackPower}");
+
+        respawnPosition = transform.position; // 스폰 위치 저장
+        Debug.Log($"[RespwanPoint] = {respawnPosition}");
     }
 
     private void RegisterMonsters()
@@ -237,7 +241,26 @@ public class PlayerController : MonoBehaviour
 
         if (fadeInOut != null)
             StartCoroutine(fadeInOut.FadeIn());
+
+        StartCoroutine(PlayerRespawnDelay(1.0f));
     }
 
+    private void HandlePlayerRespawn()
+    {
+        if (!_isPlayerDead) return;
+        _isPlayerDead = false;
+
+        // position, HP return
+        transform.position = respawnPosition; // example position
+        _playerHP = GameManager.Instance.getMaxHP();
+    }
+
+    private IEnumerator PlayerRespawnDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        HandlePlayerRespawn();
+    }
     #endregion
+
+
 }
