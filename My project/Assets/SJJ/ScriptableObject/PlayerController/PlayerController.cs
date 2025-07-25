@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 /// <summary>
@@ -37,6 +38,8 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Properties
+    public bool IsPlayerDead => _isPlayerDead;
+
     private Transform CurrentMonster
     {
         get
@@ -87,13 +90,17 @@ public class PlayerController : MonoBehaviour
 
     private void RegisterMonsters()
     {
+
         var stageInfo = GameManager.Instance.getStage();
         int stageNum = stageInfo.Item1;
         int monsterIdx = 0;
-
+        foreach (Transform monsterobj in monsters)
+        {
+            monsterobj.gameObject.SetActive(true);
+        }
         var allMonsters = GameObject.FindGameObjectsWithTag("Monster");
         Array.Sort(allMonsters, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
-
+        
         monsters.Clear();
         foreach (var monsterObj in allMonsters)
         {
@@ -113,7 +120,7 @@ public class PlayerController : MonoBehaviour
             if (ctrl != null)
             {
                 ctrl.stageNum = stageNum;
-                ctrl.monsterIndex = monsterIdx;
+                ctrl.MonsterIndex = monsterIdx;
                 Debug.Log($"[Monster Registered] {monsterObj.name} at Stage {stageNum}, Index {monsterIdx}");
             }
             monsterIdx++;
@@ -234,25 +241,30 @@ public class PlayerController : MonoBehaviour
     private void HandlePlayerDeath()
     {
         if (_isPlayerDead) return;
-
         _isPlayerDead = true;
         animator.SetTrigger("Die");
         Debug.Log("[Player Died]");
 
         if (fadeInOut != null)
+        {
             StartCoroutine(fadeInOut.FadeIn());
-
+        }
         StartCoroutine(PlayerRespawnDelay(1.0f));
+        animator.ResetTrigger("Die");
     }
 
     private void HandlePlayerRespawn()
     {
-        if (!_isPlayerDead) return;
-        _isPlayerDead = false;
+        // 몬스터 재할당
+        RegisterMonsters();
 
-        // position, HP return
-        transform.position = respawnPosition; // example position
+        // 초기화
         _playerHP = GameManager.Instance.getMaxHP();
+        transform.position = respawnPosition;
+        _currentMonsterIndex = 0;
+
+        _isPlayerDead = false;
+        Debug.Log($"[Player HP] = {_playerHP} [currentMonsterIdx] = {_currentMonsterIndex}");
     }
 
     private IEnumerator PlayerRespawnDelay(float delay)
@@ -261,6 +273,5 @@ public class PlayerController : MonoBehaviour
         HandlePlayerRespawn();
     }
     #endregion
-
 
 }
