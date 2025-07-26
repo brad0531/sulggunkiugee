@@ -253,7 +253,7 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(PlayerRespawnDelay(1.0f));
     }
 
-    private void HandlePlayerRespawn()
+    public void HandlePlayerRespawn()
     {
         RegisterMonsters();                                         // 몬스터 재등록
         _playerHP = GameManager.Instance.getMaxHP();               // HP 초기화

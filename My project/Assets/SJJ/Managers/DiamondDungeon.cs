@@ -18,5 +18,5 @@ public class DiamondDungeon : MonoBehaviour
             float baseDps = baseDamage / baseTime;
             float performancePercent = (dps / baseDps) * 100f;
         }
-    }
+    }   
 }
