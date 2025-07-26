@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
     private int _playerHP;
     private int _playerAttackPower;
     private int _currentMonsterIndex;
+    private int _currentStage;
     private Vector3 respawnPosition;
 
     private bool _isPlayerAttacking;
@@ -250,26 +251,22 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(fadeInOut.FadeIn());
         }
         StartCoroutine(PlayerRespawnDelay(1.0f));
-        animator.ResetTrigger("Die");
     }
 
     private void HandlePlayerRespawn()
     {
-        // 몬스터 재할당
-        RegisterMonsters();
-
-        // 초기화
-        _playerHP = GameManager.Instance.getMaxHP();
-        transform.position = respawnPosition;
-        _currentMonsterIndex = 0;
-
+        RegisterMonsters();                                         // 몬스터 재등록
+        _playerHP = GameManager.Instance.getMaxHP();               // HP 초기화
+        transform.position = respawnPosition;                      // 위치 복귀
+        _currentMonsterIndex = 0;                                  // 인덱스 초기화
         _isPlayerDead = false;
-        Debug.Log($"[Player HP] = {_playerHP} [currentMonsterIdx] = {_currentMonsterIndex}");
     }
 
     private IEnumerator PlayerRespawnDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
+        _currentStage = Mathf.Max(1, _currentStage - 1);
+        GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
         HandlePlayerRespawn();
     }
     #endregion
