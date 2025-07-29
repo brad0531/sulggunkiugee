@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour
         UserData.MaxHP = UserData.HP = LoadHP_Per_Level(0);
         UserData.money = 1000000;
         UserData.liver = 0;
-        UserData.stage = new Pair<int, int>(1, 0);
+        UserData.stage = new StageType<int, int, int>(1, 0, 0);
 
         setMonster(new Tuple<int, int>(1, 0));
 
@@ -109,6 +109,9 @@ public class GameManager : MonoBehaviour
         {
             UserData.effects.Add(0);
         }
+
+        for (int i = 0; i < 7; i++)
+            UserData.snack_times.Add(0);
     }
     public void SaveUserData()
     {
@@ -188,7 +191,7 @@ public class GameManager : MonoBehaviour
             {
                 string line = sr.ReadLine();
                 string[] values = line.Split(',');
-                
+
                 foreach (string obj in values)
                 {
                     if (!int.TryParse(obj, out int result))
@@ -218,7 +221,7 @@ public class GameManager : MonoBehaviour
         using (StreamReader sr = new StreamReader(path))
         {
             Debug.Log(sr.ReadLine());
-             //첫 번째 행 index 패스
+            //첫 번째 행 index 패스
             while (!sr.EndOfStream)
             {
                 string line = sr.ReadLine();
@@ -268,13 +271,13 @@ public class GameManager : MonoBehaviour
                         // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
                         continue;
                     }
-                    Info_Alcohol.Add(new List<int>());
-                    Info_Alcohol[Info_Alcohol.Count - 1].Add(result);
+                    Snacks.Add(new List<int>());
+                    Snacks[Snacks.Count - 1].Add(result);
                 }
             }
         }
         if (isTesting)
-            Debug.Log($"Drink Cost 관련 CSV 로드 완료. {Info_Alcohol.Count}개");
+            Debug.Log($"Snack Cost 관련 CSV 로드 완료. {Snacks.Count}개");
 
         path = Path.Combine(Application.streamingAssetsPath, "Snack.csv");
         if (!File.Exists(path))
@@ -283,7 +286,6 @@ public class GameManager : MonoBehaviour
             return 1;
         }
 
-        Snacks.Clear();
         index = 0;
         using (StreamReader sr = new StreamReader(path))
         {
@@ -292,7 +294,6 @@ public class GameManager : MonoBehaviour
             {
                 string line = sr.ReadLine();
                 string[] values = line.Split(',');
-                Snacks.Add(new List<int>());
                 foreach (string obj in values)
                 {
                     if (!int.TryParse(obj, out int result))
@@ -814,11 +815,15 @@ public class GameManager : MonoBehaviour
     //기타 등등
     public Tuple<int, int> getStage() //현재 플레이어가 어떤 스테이지에 있는지 튜플 형태로 반환합니다.
     {
-        return UserData.stage.toTuple();
+        return UserData.stage.ToStageTuple();
     }
     public void setStage(Tuple<int, int> stage)
     {
-        UserData.stage = new Pair<int, int>(stage.Item1, stage.Item2);
+        UserData.stage = new StageType<int, int, int>(stage);
+    }
+    public void setStage(Tuple<int, int, int> stage)
+    {
+        UserData.stage = new StageType<int, int, int>(stage);
     }
     public bool isVaildStage(Tuple<int, int> stage)
     {
@@ -853,8 +858,8 @@ public class GameManager : MonoBehaviour
 
     public bool isSnackCoolTimeEnd(int index)
     {
-        long gap = utility.get_times() - (long)UserData.effects[(int)index];
-        if (gap / ONE_SECOND >= (long)Info_Alcohol[(int)index][3])
+        long gap = utility.get_times() - (long)UserData.snack_times[index];
+        if (gap / ONE_SECOND >= (long)Snacks[index][2])
             return true;
         return false;
     }
@@ -885,6 +890,11 @@ public class GameManager : MonoBehaviour
         money = (int)((double)money * bonus);
         setMoney(getMoney() + money);
     }
+
+    public void EatSnack(int index)
+    {
+        UserData.snack_times[index] = utility.get_times();
+    }
     #endregion
 
 }
@@ -905,7 +915,8 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public List<int> skill_level = new List<int>();
     public int money, liver; //돈과 간 수치
     public List<long> effects = new List<long>(); //술 버프, 디버프 시간 저장
-    public Pair<int, int> stage;
+    public List<long> snack_times = new List<long>();
+    public StageType<int, int, int> stage;
     public long last_Attack;
     public Monster monster = new Monster();
 }
@@ -1003,3 +1014,64 @@ public class Pair<T, U>
     }
 }
 
+[System.Serializable]
+public class StageType<M, S, I>
+{
+    public M Main { get; set; }
+    public S Sub { get; set; }
+    public I Index { get; set; }
+
+    public StageType(M main, S sub, I index)
+    {
+        Main = main;
+        Sub = sub;
+        Index = index;
+    }
+
+    public StageType(System.Tuple<M, S> tmp)
+    {
+        Main = tmp.Item1;
+        Sub = tmp.Item2;
+    }
+
+    public StageType(System.Tuple<M, S, I> tmp)
+    {
+        Main = tmp.Item1;
+        Sub = tmp.Item2;
+        Index = tmp.Item3;
+    }
+
+    public override string ToString()
+    {
+        return $"({Main}, {Sub}, {Index})";
+    }
+
+    public Tuple<M, S, I> ToTuple()
+    {
+        return new Tuple<M, S, I>(Main, Sub, Index);
+    }
+
+    public Tuple<M, S> ToStageTuple()
+    {
+        return new Tuple<M, S>(Main, Sub);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is StageType<M, S, I> other)
+        {
+            return EqualityComparer<M>.Default.Equals(this.Main, other.Main)
+                && EqualityComparer<S>.Default.Equals(this.Sub, other.Sub)
+                && EqualityComparer<I>.Default.Equals(this.Index, other.Index);
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        int hash1 = Main == null ? 0 : EqualityComparer<M>.Default.GetHashCode(Main);
+        int hash2 = Sub == null ? 0 : EqualityComparer<S>.Default.GetHashCode(Sub);
+        int hash3 = Index == null ? 0 : EqualityComparer<I>.Default.GetHashCode(Index);
+        return HashCode.Combine(hash1, hash2, hash3);
+    }
+}

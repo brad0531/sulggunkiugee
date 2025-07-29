@@ -1,3 +1,4 @@
+using UnityEditor.Playables;
 using UnityEngine;
 using UnityEngine.UI;
 public class Snack : MonoBehaviour
@@ -18,8 +19,8 @@ public class Snack : MonoBehaviour
 
         money -= cost;
         GameManager.Instance.setMoney(money);
-        GameManager.Instance.effects_on(index);
-        GameManager.Instance.setLiver(liver + GameManager.Instance.Info_Alcohol[index][4]);
-        Debug.Log("과자 효과 ON");
+        GameManager.Instance.setLiver(liver - GameManager.Instance.Snacks[index][1]);
+        GameManager.Instance.EatSnack(index);
+        Debug.Log($"현재 간 수치 {GameManager.Instance.UserData.liver}");
     }
 }

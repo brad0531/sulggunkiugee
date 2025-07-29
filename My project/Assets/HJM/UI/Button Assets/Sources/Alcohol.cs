@@ -8,6 +8,7 @@ public class Alcohol : MonoBehaviour
         int money = GameManager.Instance.getMoney();
         int cost = GameManager.Instance.Load_Alcohol_Cost(idx);
         int liver = GameManager.Instance.getLiver();
+        
         if (money < cost) //돈 부족
             return;
 
@@ -21,6 +22,6 @@ public class Alcohol : MonoBehaviour
         GameManager.Instance.setMoney(money);
         GameManager.Instance.effects_on(index);
         GameManager.Instance.setLiver(liver + GameManager.Instance.Info_Alcohol[index][4]);
-        Debug.Log("술 효과 ON");
+        Debug.Log($"현재 간 수치 {GameManager.Instance.UserData.liver}");
     }
 }
