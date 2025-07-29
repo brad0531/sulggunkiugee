@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using UnityEngine;
 
@@ -217,6 +218,13 @@ public class PlayerController : MonoBehaviour
         GameManager.Instance.MonsterAttack();
         _isMonsterAttacking = false;
     }
+
+    public void SkillActivate()
+    {
+        /*
+        animator.SetTrigger("Skill");
+        */
+    }
     #endregion
 
     #region Utilities & Events
@@ -271,4 +279,43 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
+    #region csv데이터 로딩
+    public void CSVloading()
+    {
+        int result = 0;
+        result += LoadActs();
+    }
+
+    private int LoadActs()
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, "Acts/Acts.csv");
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"Acts CSV 파일을 찾을 수 없습니다: {path}\n");
+            return 1;
+        }
+        int index;
+        using (StreamReader sr = new StreamReader(path))
+        {
+            sr.ReadLine();
+            index = 0;
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                string[] values = line.Split(',');
+
+                foreach (string obj in values)
+                {
+                    if (!int.TryParse(obj, out int result))
+                    {
+                        // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
+                        continue;
+                    }
+                    //Info_Acts.Add(new List<int>(result));   
+                }
+            }
+        }
+        return 0;
+    }
+    #endregion
 }
