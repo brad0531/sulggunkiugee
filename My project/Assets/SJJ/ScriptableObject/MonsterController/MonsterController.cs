@@ -5,6 +5,7 @@ using NUnit.Framework.Internal;
 using UnityEditor.EditorTools;
 using UnityEngine;
 using System.Collections;
+using UnityEditor.Experimental.GraphView;
 
 
 public class MonsterController : MonoBehaviour
@@ -12,19 +13,28 @@ public class MonsterController : MonoBehaviour
     public delegate void MonsterDieEvent(MonsterController monster);
     public static event MonsterDieEvent IsMonsterDie;
     public static event Action<MonsterController> OnMonsterCompletelyDestroyed;
+
+    //public static int staticmonsterIndex = 0;
+
     [Header("몬스터 식별 정보")]
     public int stageNum = 1;     // 스테이지 번호 (예: 1)
-    public int monsterIndex = 0; // 몬스터 인덱스
+    public int MonsterIndex = 0;
     public int count = 10; // 몬스터 개수
+
+    #region Private Fields
 
     private int MonstercurrentHP;
     private int MonstermaxHP;
     private int MonsterattackPower;
+
+    #endregion
     void Start()
     {
-        // 몬스터 스탯 세팅
-        // 일단 몬스터 스탯을 초기화해야 하긴 하는데, 로그 도배되는 거 같아서 스타트로 해놨어.
-        GameManager.Instance.setMonster(new System.Tuple<int, int>(stageNum, monsterIndex));
+        SetMonsterStats();
+    }
+    public void SetMonsterStats()
+    {
+        GameManager.Instance.setMonster(new System.Tuple<int, int>(stageNum, MonsterIndex));
         MonstermaxHP = GameManager.Instance.getMonsterMaxHP();
         MonstercurrentHP = GameManager.Instance.getMonsterHP();
         MonsterattackPower = GameManager.Instance.getMonsterATK();
@@ -41,22 +51,20 @@ public class MonsterController : MonoBehaviour
     }
     private void Die()
     {
-        Debug.Log($"[몬스터 사망] 스테이지 {stageNum}-{monsterIndex}");
+        Debug.Log($"[몬스터 사망] 스테이지 {stageNum}-{MonsterIndex}");
         if (IsMonsterDie != null)
             IsMonsterDie(this);
-        // 1초 지연
-        StartCoroutine(DelayedDestory(1.0f));
+        // 0.5초 지연
+        StartCoroutine(DelayedInactivate(0.5f));
     }
-    private IEnumerator DelayedDestory(float delay)
+    private IEnumerator DelayedInactivate(float delay)
     {
         yield return new WaitForSeconds(delay);
         if (OnMonsterCompletelyDestroyed != null)
             OnMonsterCompletelyDestroyed(this);
 
-        Destroy(gameObject);
-
+        gameObject.SetActive(false);
     }
-
     public bool IsDead()
     {
         return MonstercurrentHP <= 0;

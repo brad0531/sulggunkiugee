@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 /// <summary>
@@ -11,8 +12,8 @@ public class PlayerController : MonoBehaviour
 {
     #region Inspector Fields
     [Header("플레이어 스탯")]
-    [SerializeField, Min(0f)] private float moveSpeed = 100f;
-    [SerializeField, Min(0f)] private float attackRange = 150f;
+    [SerializeField, Min(0f)] private float moveSpeed = 500f;
+    [SerializeField, Min(0f)] private float attackRange = 200f;
     [SerializeField, Min(0f)] private float moveDistanceAfterKill = 30f;
 
     [Header("애니메이터")]
@@ -29,6 +30,8 @@ public class PlayerController : MonoBehaviour
     private int _playerHP;
     private int _playerAttackPower;
     private int _currentMonsterIndex;
+    private int _currentStage;
+    private Vector3 respawnPosition;
 
     private bool _isPlayerAttacking;
     private bool _isMonsterAttacking;
@@ -36,6 +39,8 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Properties
+    public bool IsPlayerDead => _isPlayerDead;
+
     private Transform CurrentMonster
     {
         get
@@ -79,17 +84,24 @@ public class PlayerController : MonoBehaviour
         _playerHP = GameManager.Instance.getHP();
         _playerAttackPower = GameManager.Instance.getATK();
         Debug.Log($"[Player Stats] HP={_playerHP}, ATK={_playerAttackPower}");
+
+        respawnPosition = transform.position; // 스폰 위치 저장
+        Debug.Log($"[RespwanPoint] = {respawnPosition}");
     }
 
     private void RegisterMonsters()
     {
+
         var stageInfo = GameManager.Instance.getStage();
         int stageNum = stageInfo.Item1;
         int monsterIdx = 0;
-
+        foreach (Transform monsterobj in monsters)
+        {
+            monsterobj.gameObject.SetActive(true);
+        }
         var allMonsters = GameObject.FindGameObjectsWithTag("Monster");
         Array.Sort(allMonsters, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
-
+        
         monsters.Clear();
         foreach (var monsterObj in allMonsters)
         {
@@ -109,7 +121,7 @@ public class PlayerController : MonoBehaviour
             if (ctrl != null)
             {
                 ctrl.stageNum = stageNum;
-                ctrl.monsterIndex = monsterIdx;
+                ctrl.MonsterIndex = monsterIdx;
                 Debug.Log($"[Monster Registered] {monsterObj.name} at Stage {stageNum}, Index {monsterIdx}");
             }
             monsterIdx++;
@@ -230,14 +242,33 @@ public class PlayerController : MonoBehaviour
     private void HandlePlayerDeath()
     {
         if (_isPlayerDead) return;
-
         _isPlayerDead = true;
         animator.SetTrigger("Die");
         Debug.Log("[Player Died]");
 
         if (fadeInOut != null)
+        {
             StartCoroutine(fadeInOut.FadeIn());
+        }
+        StartCoroutine(PlayerRespawnDelay(1.0f));
     }
 
+    public void HandlePlayerRespawn()
+    {
+        RegisterMonsters();                                         // 몬스터 재등록
+        _playerHP = GameManager.Instance.getMaxHP();               // HP 초기화
+        transform.position = respawnPosition;                      // 위치 복귀
+        _currentMonsterIndex = 0;                                  // 인덱스 초기화
+        _isPlayerDead = false;
+    }
+
+    private IEnumerator PlayerRespawnDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        _currentStage = Mathf.Max(1, _currentStage - 1);
+        GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
+        HandlePlayerRespawn();
+    }
     #endregion
+
 }

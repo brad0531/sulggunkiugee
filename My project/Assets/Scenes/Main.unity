@@ -149,8 +149,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isTesting: 1
-  costFileName: Costs/Cost_CSV.csv
   UserData_FilePath: UserData/UserData.json
+  UserData:
+    ATK: 0
+    HP: 0
+    MaxHP: 0
+    ATK_speed: 0
+    CritPercent: 0
+    status_levels: 
+    skill_level: 
+    money: 0
+    liver: 0
+    effects: 
+    last_Attack: 0
+    monster:
+      MaxHP: 0
+      HP: 0
+      ATK: 0
+      last_Attack: 0
   Save_Frequency: 100000000
 --- !u!4 &759752392
 Transform:
