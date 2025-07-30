@@ -91,7 +91,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"[RespwanPoint] = {respawnPosition}");
     }
 
-    private void RegisterMonsters()
+    public void RegisterMonsters()
     {
 
         var stageInfo = GameManager.Instance.getStage();
