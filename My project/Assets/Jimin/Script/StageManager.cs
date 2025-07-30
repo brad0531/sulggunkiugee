@@ -46,6 +46,7 @@ public class StageManager : MonoBehaviour
             enemiesList.Add(enemies);
         }
         isRespawning = false;
+        //playercontroller.Register
     }
 
     void TutorialSpawnMonster() 
@@ -130,7 +131,7 @@ public class StageManager : MonoBehaviour
         stage = GameManager.Instance.getStage();
         if (stage.Item1 == 0 && stage.Item2 == 0) //튜토리얼 스테이지가 0 - 0 이라고 할때
         {
-            SceneManager.LoadScene("Tutorial");
+            //SceneManager.LoadScene("Tutorial");
             TutorialSpawnMonster();
         }
         else
