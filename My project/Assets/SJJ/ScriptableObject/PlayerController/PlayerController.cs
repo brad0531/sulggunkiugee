@@ -56,6 +56,7 @@ public class PlayerController : MonoBehaviour
     #region Unity Callbacks
     private void Start()
     {
+        CSVloading();
         InitializePlayerStats();
         RegisterMonsters();
     }
@@ -100,7 +101,7 @@ public class PlayerController : MonoBehaviour
         {
             monsterobj.gameObject.SetActive(true);
         }
-        var allMonsters = GameObject.FindGameObjectsWithTag("Monster");
+        var allMonsters = GameObject.FindGameObjectsWithTag("enemy");
         Array.Sort(allMonsters, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
         
         monsters.Clear();
@@ -279,43 +280,47 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region csv데이터 로딩
-    public void CSVloading()
-    {
-        int result = 0;
-        result += LoadActs();
-    }
+    #region csv데이터
+        public List<ActData> Info_Acts = new List<ActData>();
 
-    private int LoadActs()
-    {
-        string path = Path.Combine(Application.streamingAssetsPath, "Acts/Acts.csv");
-        if (!File.Exists(path))
+        public void CSVloading()
         {
-            Debug.LogError($"Acts CSV 파일을 찾을 수 없습니다: {path}\n");
-            return 1;
+            LoadActs();
         }
-        int index;
-        using (StreamReader sr = new StreamReader(path))
-        {
-            sr.ReadLine();
-            index = 0;
-            while (!sr.EndOfStream)
-            {
-                string line = sr.ReadLine();
-                string[] values = line.Split(',');
 
-                foreach (string obj in values)
+        private int LoadActs()
+        {
+            string path = Path.Combine(Application.streamingAssetsPath, "Acts/Acts.csv");
+            if (!File.Exists(path))
+            {
+                Debug.LogError($"Acts CSV 파일을 찾을 수 없습니다: {path}");
+                return 1;
+            }
+            using (StreamReader sr = new StreamReader(path))
+            {
+                sr.ReadLine(); // 헤더 건너뜀
+                while (!sr.EndOfStream)
                 {
-                    if (!int.TryParse(obj, out int result))
+                    string line = sr.ReadLine();
+                    string[] values = line.Split(',');
+
+                    ActData act = new ActData();
+                    foreach (string obj in values)
                     {
-                        // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
-                        continue;
+                        if (int.TryParse(obj, out int number))
+                            act.values.Add(number);
                     }
-                    //Info_Acts.Add(new List<int>(result));   
+                    Info_Acts.Add(act);
                 }
             }
-        }
+        Debug.Log($"Acts CSV를 성공적으로 불러왔습니다. 총 {Info_Acts.Count}개 로드됨.");
         return 0;
+        }
     }
+
+    public class ActData
+    {
+        public List<int> values = new List<int>();
+    }
+
     #endregion
-}
