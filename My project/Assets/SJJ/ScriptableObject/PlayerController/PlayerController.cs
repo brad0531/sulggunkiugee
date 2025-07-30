@@ -101,7 +101,7 @@ public class PlayerController : MonoBehaviour
         {
             monsterobj.gameObject.SetActive(true);
         }
-        var allMonsters = GameObject.FindGameObjectsWithTag("Monster");
+        var allMonsters = GameObject.FindGameObjectsWithTag("enemy");
         Array.Sort(allMonsters, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
         
         monsters.Clear();
