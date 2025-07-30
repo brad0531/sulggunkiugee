@@ -1,15 +1,17 @@
 using NUnit.Framework;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Linq;
-using System;
 
 public class StageManager : MonoBehaviour
 {
     public GameObject Monster;
     public GameObject Boss;
     public FadeInOut fadeEffect;
+    private PlayerController playercontroller;
     public Tuple<int, int> stage = new Tuple<int, int>(0, 0); //gamemanager에서 Stage 받아오기용
 
     private GameObject enemy;
@@ -19,10 +21,20 @@ public class StageManager : MonoBehaviour
     private bool isRespawning = false;
     private bool tutorialClear = false;
 
-    private int mainStage = 0;
-    private int substage = 0;
+    private int _currentStage = 0;
+    private int subStage = 0;
+
+    public float delay = 0.5f;
 
     private List<GameObject> enemiesList = new List<GameObject>();
+
+    private IEnumerator PlayerRespawnDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        _currentStage = Mathf.Max(1, _currentStage - 1);
+        GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
+        playercontroller.HandlePlayerRespawn();
+    }
 
     void SpawnMonsters()
     {
@@ -38,7 +50,7 @@ public class StageManager : MonoBehaviour
 
     void TutorialSpawnMonster() 
     {
-        // 플레이어 리스폰 함수
+        PlayerRespawnDelay(delay);
         enemiesList.Clear();
         Vector3 playerPosition = GameObject.FindWithTag("Player").transform.position;
         for (int i = 0; i < 50; i++)
@@ -52,8 +64,13 @@ public class StageManager : MonoBehaviour
     void BossSpawn()
     {
         FadeInOut.Fade(fadeEffect);
-        // 플레이어 리스폰 함수 호출 
+        PlayerRespawnDelay(delay);
         Vector3 playerPosition = GameObject.FindWithTag("Player").transform.position;
+        for (int i = 0; i < 10; i++)
+        {
+            enemies = (GameObject)Instantiate(Monster, new Vector3(playerPosition.x + 1000 + 2000 * i, playerPosition.y), Quaternion.identity);
+            enemiesList.Add(enemies);
+        }
         BossMon = (GameObject)Instantiate(Boss, new Vector3(playerPosition.x + 1000, playerPosition.y), Quaternion.identity);
         isRespawning = false;
         //대화 스크립트 출력
@@ -62,7 +79,7 @@ public class StageManager : MonoBehaviour
     void Respawn()
     {
         FadeInOut.Fade(fadeEffect);
-        //플레이어 리스폰 함수 호출 
+        PlayerRespawnDelay(delay);
         SpawnMonsters();
     }
 
@@ -72,15 +89,34 @@ public class StageManager : MonoBehaviour
          //if(플레이어 죽음 판정 시)
         {
             stage = GameManager.Instance.getStage();
-            if (stage.Item1 == 0) //튜토리얼
+
+            //튜토리얼
+            if (stage.Item1 == 0) 
             {
                 FadeInOut.Fade(fadeEffect);
                 TutorialSpawnMonster();
             }
-            if (stage.Item1 >= 1) 
+
+            // 튜토리얼, 1-0 제외 n-0
+            if (stage.Item1 > 1 && stage.Item2 == 0)
             {
-                stage = new Tuple<int, int>(0, 0);
-                GameManager.Instance.setStage(stage);
+                _currentStage = stage.Item1 - 1;
+                subStage = 5;
+                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, subStage));
+            }
+
+            // 1-0
+            if (stage.Item1 == 1 && stage.Item2 == 0)
+            {
+                enemiesList.Clear();
+                Respawn();
+            } 
+
+            // 튜토리얼 제외 n-1 ~ n-5
+            if (stage.Item1 >= 1 && stage.Item2 >= 1 && stage.Item2 <= 5) 
+            {
+                subStage = stage.Item2 - 1;
+                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, subStage));
             }
 
         }
@@ -105,6 +141,9 @@ public class StageManager : MonoBehaviour
 
     void Update()
     {
+
+        //Playerdying();
+
         // 튜토리얼
         if (stage.Item1 == 0 && stage.Item2 == 0)
         {
@@ -119,8 +158,8 @@ public class StageManager : MonoBehaviour
             if(tutorialClear == true)
             {
                 enemiesList.Clear();
-                mainStage++;
-                GameManager.Instance.setStage(new Tuple<int, int>(mainStage, 0));
+                _currentStage++;
+                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
             }
         }
 
@@ -144,8 +183,8 @@ public class StageManager : MonoBehaviour
                 // 1-5
                 isRespawning = true;
                 BossSpawn();
-                mainStage++;
-                GameManager.Instance.setStage(new Tuple<int, int>(mainStage, 0));
+                _currentStage++;
+                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
             }
             
         }
@@ -159,5 +198,18 @@ public class StageManager : MonoBehaviour
                 SceneManager.LoadScene("Stage2");
             }
         } */
+
+        // 해피엔딩
+        if (stage.Item1 == 7 && stage.Item2 == 0)
+        {
+            SceneManager.LoadScene("HappyEnding");
+        }
+
+        // 배드 엔딩
+        int liver = GameManager.Instance.getLiver();
+        if (liver >= 10000)
+        {
+            SceneManager.LoadScene("BadEnding");
+        }
     }
 }

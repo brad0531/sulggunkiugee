@@ -547,6 +547,7 @@ MonoBehaviour:
   Monster: {fileID: 6767739467831425112, guid: 7e4efa6a5e1754d4baa61a952cdd2119, type: 3}
   Boss: {fileID: 6422775478912518368, guid: d43504984de76084dbded37c0c981421, type: 3}
   fadeEffect: {fileID: 1151682679}
+  delay: 0.5
 --- !u!114 &1151682681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -868,7 +869,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 0, b: 0, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
