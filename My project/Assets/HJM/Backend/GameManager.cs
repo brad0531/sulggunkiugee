@@ -873,8 +873,14 @@ public class GameManager : MonoBehaviour
     {
         long gap = utility.get_times() - (long)UserData.effects[(int)index];
         if (gap / ONE_SECOND >= (long)Info_Alcohol[(int)index][2])
-            return true;
-        return false;
+            return false;
+        return true;
+    }
+
+    public int getRestAlcoholCoolTime(int index)
+    {
+        long gap = utility.get_times() - (long)UserData.effects[(int)index];
+        return Math.Max(0, (int)(((long)Info_Alcohol[(int)index][3] - gap) / ONE_SECOND));
     }
 
     public void EarnMoney(int money)
