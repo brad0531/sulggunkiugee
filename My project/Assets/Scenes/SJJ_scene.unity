@@ -149,8 +149,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageNum: 1
-  MonsterIndex: 0
   count: 10
 --- !u!212 &175886661
 SpriteRenderer:
@@ -361,6 +359,7 @@ MonoBehaviour:
   - {fileID: 1981489014}
   - {fileID: 1846068203}
   - {fileID: 1592601587}
+  Info_Acts: []
 --- !u!1 &364989075
 GameObject:
   m_ObjectHideFlags: 0
@@ -391,8 +390,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageNum: 1
-  MonsterIndex: 0
   count: 10
 --- !u!212 &364989077
 SpriteRenderer:
@@ -494,8 +491,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageNum: 1
-  MonsterIndex: 0
   count: 10
 --- !u!212 &583287154
 SpriteRenderer:
@@ -597,8 +592,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageNum: 1
-  MonsterIndex: 0
   count: 10
 --- !u!212 &615884794
 SpriteRenderer:
@@ -837,7 +830,7 @@ GameObject:
   - component: {fileID: 1333873545}
   m_Layer: 0
   m_Name: Enemy UI_0
-  m_TagString: Monster
+  m_TagString: enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -924,8 +917,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageNum: 0
-  MonsterIndex: 0
   count: 10
 --- !u!1 &1361529807
 GameObject:
@@ -957,8 +948,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageNum: 1
-  MonsterIndex: 0
   count: 10
 --- !u!212 &1361529809
 SpriteRenderer:
@@ -1101,8 +1090,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageNum: 1
-  MonsterIndex: 0
   count: 10
 --- !u!212 &1592601586
 SpriteRenderer:
@@ -1204,8 +1191,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageNum: 1
-  MonsterIndex: 0
   count: 10
 --- !u!212 &1846068202
 SpriteRenderer:
@@ -1290,7 +1275,7 @@ GameObject:
   - component: {fileID: 1851535327}
   m_Layer: 0
   m_Name: Enemy UI_1
-  m_TagString: Monster
+  m_TagString: enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1377,8 +1362,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageNum: 1
-  MonsterIndex: 0
   count: 10
 --- !u!1 &1981489011
 GameObject:
@@ -1410,8 +1393,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdafa74e6b0668d47ae2e8b51056b07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageNum: 1
-  MonsterIndex: 0
   count: 10
 --- !u!212 &1981489013
 SpriteRenderer:

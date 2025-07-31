@@ -332,12 +332,15 @@ public class PlayerController : MonoBehaviour
     }
 
     private void ActiveAct(ActData act)
-        {
-            if (act == null) return;
+    {
+        if (act == null) return;
+
         Debug.Log($"이름: {act.Name}, 행위: {act.Act}");
-
+        if (act.Name == "Player" && act.Act == "idle")
+        {
+            // Idle
         }
-
+    }
 }
 
     #endregion
