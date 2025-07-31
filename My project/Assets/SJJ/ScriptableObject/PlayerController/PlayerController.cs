@@ -93,38 +93,42 @@ public class PlayerController : MonoBehaviour
 
     public void RegisterMonsters()
     {
-
         var stageInfo = GameManager.Instance.getStage();
-        int stageNum = stageInfo.Item1;
+        int mainStage = 1;   // 필요한 값으로 초기화
+        int subStage = 0;    // 필요한 값으로 초기화
         int monsterIdx = 0;
+
+        // 기존 몬스터 활성화
         foreach (Transform monsterobj in monsters)
-        {
             monsterobj.gameObject.SetActive(true);
-        }
+
+        // 몬스터 리스트 정렬 후 교체
         var allMonsters = GameObject.FindGameObjectsWithTag("enemy");
         Array.Sort(allMonsters, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
-        
+
         monsters.Clear();
+
         foreach (var monsterObj in allMonsters)
         {
-            while (!GameManager.Instance.isVaildStage(new Tuple<int, int>(stageNum, monsterIdx)))
+            // 현재 (mainStage, subStage, monsterIdx)가 유효한 스테이지인지 확인
+            while (!GameManager.Instance.isVaildStage(new Tuple<int, int, int>(mainStage, subStage, monsterIdx)))
             {
-                stageNum++;
                 monsterIdx = 0;
-                if (!GameManager.Instance.isVaildStage(new Tuple<int, int>(stageNum, monsterIdx)))
+                subStage++;
+                if (!GameManager.Instance.isVaildStage(new Tuple<int, int, int>(mainStage, subStage, monsterIdx)))
                 {
-                    Debug.LogWarning($"[Stage Load Failed] stage={stageNum}, index={monsterIdx}");
+                    Debug.LogWarning($"[Stage Load Failed] stage={mainStage}, sub={subStage}, idx={monsterIdx}");
                     return;
                 }
             }
 
             monsters.Add(monsterObj.transform);
+
             var ctrl = monsterObj.GetComponent<MonsterController>();
             if (ctrl != null)
             {
-                ctrl.stageNum = stageNum;
-                ctrl.MonsterIndex = monsterIdx;
-                Debug.Log($"[Monster Registered] {monsterObj.name} at Stage {stageNum}, Index {monsterIdx}");
+                ctrl.stage = (mainStage, subStage, monsterIdx);
+                Debug.Log($"[Monster Registered] {monsterObj.name} at Stage {mainStage}_{subStage}_{monsterIdx}");
             }
             monsterIdx++;
         }
@@ -132,6 +136,7 @@ public class PlayerController : MonoBehaviour
         MonsterController.IsMonsterDie += OnMonsterDie;
         MonsterController.OnMonsterCompletelyDestroyed += OnMonsterDestroyed;
     }
+
     #endregion
 
     #region Movement & Attacks
@@ -287,10 +292,14 @@ public class PlayerController : MonoBehaviour
         {
             LoadActs();
         }
-
+        
+        private void ActiveAct(ActData act)
+        {
+            if (act == null) return;
+        }
         private int LoadActs()
         {
-            string path = Path.Combine(Application.streamingAssetsPath, "Acts/Acts.csv");
+            string path = Path.Combine(Application.streamingAssetsPath, "Acts/act.csv");
             if (!File.Exists(path))
             {
                 Debug.LogError($"Acts CSV 파일을 찾을 수 없습니다: {path}");
