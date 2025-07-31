@@ -308,7 +308,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        
+
 
         if (isTesting)
             Debug.Log($"Snack 관련 CSV 로드 완료");
@@ -454,10 +454,19 @@ public class GameManager : MonoBehaviour
             Debug.LogError($"Normal Monster 레벨별 CSV 파일을 찾을 수 없습니다: {path}\n");
             return 1;
         }
-        string[] lines = File.ReadAllLines(path);
+        List<string> lines = new List<string> (File.ReadAllLines(path));
+        path = Path.Combine(Application.streamingAssetsPath, "Monster/Boss_Monster.csv");
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"Boss Monster 레벨별 CSV 파일을 찾을 수 없습니다: {path}\n");
+            return 1;
+        }
+        List<string> tmp = new List<string> (File.ReadAllLines(path));
+        tmp.RemoveAt(0);
+        lines.AddRange(tmp);
 
         // 첫 줄은 헤더이므로 1부터 시작
-        for (int i = 1; i < lines.Length; i++)
+        for (int i = 1; i < lines.Count; i++)
         {
             string line = lines[i];
             if (string.IsNullOrWhiteSpace(line)) continue;
@@ -485,10 +494,10 @@ public class GameManager : MonoBehaviour
             // Monster_H, Monster_D, Gold
             int monsterH = int.Parse(parts[1]);
             int monsterD = int.Parse(parts[2]);
-            int gold     = int.Parse(parts[3]);
+            int gold = int.Parse(parts[3]);
 
             var stageKey = Tuple.Create(stageA, stageB, stageC);
-            var value    = Tuple.Create(monsterH, monsterD, gold);
+            var value = Tuple.Create(monsterH, monsterD, gold);
 
             Monster_lists[stageKey] = value;
         }
@@ -805,17 +814,32 @@ public class GameManager : MonoBehaviour
 
     #region 기타 등등
     //기타 등등
+
+    //Main, Sub만 불러옵니다.
     public Tuple<int, int> getStage() //현재 플레이어가 어떤 스테이지에 있는지 튜플 형태로 반환합니다.
     {
         return UserData.stage.ToStageTuple();
     }
+    
+    //Main, Sub, index를 불러옵니다.
+    public Tuple<int, int, int> getAllStage() {
+        return UserData.stage.ToTuple();
+    }
     public void setStage(Tuple<int, int> stage)
     {
         UserData.stage = new StageType<int, int, int>(stage);
+        if (UserData.stage.Main > UserData.Max_stage.Main)
+            UserData.Max_stage = UserData.stage;
+        else if (UserData.stage.Main == UserData.Max_stage.Main && UserData.stage.Sub > UserData.Max_stage.Sub)
+            UserData.Max_stage = UserData.stage;
     }
     public void setStage(Tuple<int, int, int> stage)
     {
         UserData.stage = new StageType<int, int, int>(stage);
+        if (UserData.stage.Main > UserData.Max_stage.Main)
+            UserData.Max_stage = UserData.stage;
+        else if (UserData.stage.Main == UserData.Max_stage.Main && UserData.stage.Sub > UserData.Max_stage.Sub)
+            UserData.Max_stage = UserData.stage;
     }
     public bool isVaildStage(Tuple<int, int, int> stage)
     {
@@ -889,9 +913,28 @@ public class GameManager : MonoBehaviour
         setMoney(getMoney() + money);
     }
 
+    public void BeatMonster()
+    {
+        if (isBossMonster(getAllStage()))
+        {
+            UserData.diamond += UserData.monster.Gold;
+        }
+        else
+        {
+            EarnMoney(UserData.monster.Gold);
+        }
+    }
+
     public void EatSnack(int index)
     {
         UserData.snack_times[index] = utility.get_times();
+    }
+
+    public bool isBossMonster(Tuple<int, int, int> stage)
+    {
+        if (stage.Item2 == 6)
+            return true;
+        return false;
     }
     #endregion
 
@@ -911,10 +954,11 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public double ATK_speed, CritPercent;
     public List<int> status_levels = new List<int>(); //각 스탯 강화 레벨 기록
     public List<int> skill_level = new List<int>();
-    public int money, liver; //돈과 간 수치
+    public int money, liver, diamond = 0; //돈과 간 수치
     public List<long> effects = new List<long>(); //술 버프, 디버프 시간 저장
     public List<long> snack_times = new List<long>();
     public StageType<int, int, int> stage;
+    public StageType<int, int, int> Max_stage; //스테이지 최고 기록
     public long last_Attack;
     public Monster monster = new Monster();
 }
