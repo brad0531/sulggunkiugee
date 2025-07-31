@@ -286,50 +286,58 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region csv데이터
-        public List<ActData> Info_Acts = new List<ActData>();
-
-        public void CSVloading()
-        {
-            LoadActs();
-        }
-        
-        private void ActiveAct(ActData act)
-        {
-            if (act == null) return;
-        }
-        private int LoadActs()
-        {
-            string path = Path.Combine(Application.streamingAssetsPath, "Acts/act.csv");
-            if (!File.Exists(path))
-            {
-                Debug.LogError($"Acts CSV 파일을 찾을 수 없습니다: {path}");
-                return 1;
-            }
-            using (StreamReader sr = new StreamReader(path))
-            {
-                sr.ReadLine(); // 헤더 건너뜀
-                while (!sr.EndOfStream)
-                {
-                    string line = sr.ReadLine();
-                    string[] values = line.Split(',');
-
-                    ActData act = new ActData();
-                    foreach (string obj in values)
-                    {
-                        if (int.TryParse(obj, out int number))
-                            act.values.Add(number);
-                    }
-                    Info_Acts.Add(act);
-                }
-            }
-        Debug.Log($"Acts CSV를 성공적으로 불러왔습니다. 총 {Info_Acts.Count}개 로드됨.");
-        return 0;
-        }
-    }
-
+    [System.Serializable]
     public class ActData
     {
-        public List<int> values = new List<int>();
+        public string Name;
+        public string Act;
     }
+
+    public List<ActData> Info_Acts = new List<ActData>();
+
+    public void CSVloading()
+    {
+       LoadActs();
+    }
+
+    private int LoadActs()
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, "Acts/act.csv");
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"Acts CSV 파일을 찾을 수 없습니다: {path}");
+            return 1;
+        }
+        using (StreamReader sr = new StreamReader(path))
+        {
+            string header = sr.ReadLine(); // 헤더 건너띔 (Name,Act)
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                string[] values = line.Split(',');
+
+                // 값 개수가 2개(Name, Act)라고 가정
+                if (values.Length < 2) continue;
+
+                ActData act = new ActData
+                {
+                    Name = values[0],
+                    Act = values[1]
+                };
+                Info_Acts.Add(act);
+            }
+        }
+        Debug.Log($"Acts CSV를 성공적으로 불러왔습니다. 총 {Info_Acts.Count}개 로드됨.");
+        return 0;
+    }
+
+    private void ActiveAct(ActData act)
+        {
+            if (act == null) return;
+        Debug.Log($"이름: {act.Name}, 행위: {act.Act}");
+
+        }
+
+}
 
     #endregion
