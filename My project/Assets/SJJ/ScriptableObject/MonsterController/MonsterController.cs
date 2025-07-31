@@ -51,7 +51,7 @@ public class MonsterController : MonoBehaviour
     private void Die()
     {
         Debug.Log($"[몬스터 사망] 스테이지 {stage.Item1}-{stage.Item2}-{stage.Item3}");
-        // GameManager.instance.BeatMonster();
+        GameManager.Instance.BeatMonster();
         if (IsMonsterDie != null)
             IsMonsterDie(this);
         // 0.5초 지연
