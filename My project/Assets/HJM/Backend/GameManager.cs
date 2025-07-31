@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
     private List<int> HP_levels_lists = new List<int>();
     private List<double> ATKspeed_levels_lists = new List<double>();
     private List<double> CRIpercent_levels_lists = new List<double>();
-    private Dictionary<Tuple<int, int>, Tuple<int, int>> Monster_lists = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
+    private Dictionary<Tuple<int, int, int>, Tuple<int, int, int>> Monster_lists = new Dictionary<Tuple<int, int, int>, Tuple<int, int, int>>();
     private Pair<Tuple<int, bool>, List<Tuple<string, string>>> Scripts = new Pair<Tuple<int, bool>, List<Tuple<string, string>>>(new Tuple<int, bool>(0, true), new List<Tuple<string, string>>());
     public List<List<int>> Info_Alcohol = new List<List<int>>();
     public List<List<int>> Snacks = new List<List<int>>();
@@ -93,7 +93,7 @@ public class GameManager : MonoBehaviour
         UserData.liver = 0;
         UserData.stage = new StageType<int, int, int>(1, 0, 0);
 
-        setMonster(new Tuple<int, int>(1, 0));
+        setMonster(new Tuple<int, int, int>(1, 0, 0));
 
         for (int i = 0; i < 4; i++)
         {
@@ -454,52 +454,43 @@ public class GameManager : MonoBehaviour
             Debug.LogError($"Normal Monster 레벨별 CSV 파일을 찾을 수 없습니다: {path}\n");
             return 1;
         }
-        using (StreamReader sr = new StreamReader(path))
+        string[] lines = File.ReadAllLines(path);
+
+        // 첫 줄은 헤더이므로 1부터 시작
+        for (int i = 1; i < lines.Length; i++)
         {
-            List<Tuple<int, int>> index = new List<Tuple<int, int>>();
-            int tmp = 0;
-            string line = sr.ReadLine();
-            string[] values = line.Split(',');
+            string line = lines[i];
+            if (string.IsNullOrWhiteSpace(line)) continue;
 
-            foreach (string obj in values)
+            string[] parts = line.Split(',');
+
+            if (parts.Length < 4)
             {
-                if (tmp++ == 0) //비어있으면 (stage)
-                    continue;
-                string[] stage_str = obj.Split('_');
-                int F = int.Parse(stage_str[0]);
-                int S = int.Parse(stage_str[1]);
-
-                index.Add(new Tuple<int, int>(F, S));
+                Debug.LogWarning($"잘못된 데이터 형식: {line}");
+                continue;
             }
 
-            line = sr.ReadLine();
-            values = line.Split(',');
-            tmp = 0;
-
-            foreach (string obj in values)
+            // Stage 파싱 (예: "1_0_0")
+            string[] stageParts = parts[0].Split('_');
+            if (stageParts.Length != 3)
             {
-                if (!int.TryParse(obj, out int result))
-                {
-                    // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
-                    continue;
-                }
-                Monster_lists.Add(index[tmp], new Tuple<int, int>(result, 0));
-                tmp++;
+                Debug.LogWarning($"잘못된 Stage 형식: {parts[0]}");
+                continue;
             }
 
-            line = sr.ReadLine();
-            values = line.Split(',');
-            tmp = 0;
-            foreach (string obj in values)
-            {
-                if (!int.TryParse(obj, out int result))
-                {
-                    // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
-                    continue;
-                }
-                Monster_lists[index[tmp]] = new Tuple<int, int>(Monster_lists[index[tmp]].Item1, result);
-                tmp++;
-            }
+            int stageA = int.Parse(stageParts[0]);
+            int stageB = int.Parse(stageParts[1]);
+            int stageC = int.Parse(stageParts[2]);
+
+            // Monster_H, Monster_D, Gold
+            int monsterH = int.Parse(parts[1]);
+            int monsterD = int.Parse(parts[2]);
+            int gold     = int.Parse(parts[3]);
+
+            var stageKey = Tuple.Create(stageA, stageB, stageC);
+            var value    = Tuple.Create(monsterH, monsterD, gold);
+
+            Monster_lists[stageKey] = value;
         }
         if (isTesting)
         {
@@ -735,7 +726,7 @@ public class GameManager : MonoBehaviour
 
 
     #region 몬스터 데이터 getter/setter
-    public void setMonster(Tuple<int, int> stage)
+    public void setMonster(Tuple<int, int, int> stage)
     {
         if (Monster_lists == null)
         {
@@ -745,15 +736,16 @@ public class GameManager : MonoBehaviour
 
         if (!Monster_lists.ContainsKey(stage))
         {
-            Debug.LogError($"monsterDictionary에 해당 키 ({stage.Item1}, {stage.Item2})가 없습니다.");
+            Debug.LogError($"monsterDictionary에 해당 키 ({stage.Item1}, {stage.Item2}, {stage.Item3})가 없습니다.");
             return;
         }
 
-        if (Monster_lists.TryGetValue(stage, out Tuple<int, int> monsterData))
+        if (Monster_lists.TryGetValue(stage, out Tuple<int, int, int> monsterData))
         {
             UserData.monster.HP = monsterData.Item1;
             UserData.monster.MaxHP = monsterData.Item1;
             UserData.monster.ATK = monsterData.Item2;
+            UserData.monster.Gold = monsterData.Item3;
             UserData.monster.last_Attack = 0;
         }
         else
@@ -825,9 +817,9 @@ public class GameManager : MonoBehaviour
     {
         UserData.stage = new StageType<int, int, int>(stage);
     }
-    public bool isVaildStage(Tuple<int, int> stage)
+    public bool isVaildStage(Tuple<int, int, int> stage)
     {
-        if (Monster_lists.TryGetValue(stage, out Tuple<int, int> monsterData))
+        if (Monster_lists.TryGetValue(stage, out Tuple<int, int, int> monsterData))
         {
             return true;
         }
@@ -909,7 +901,7 @@ public class GameManager : MonoBehaviour
 
 public class Monster
 {
-    public int MaxHP, HP, ATK;
+    public int MaxHP, HP, ATK, Gold;
     public long last_Attack;
 }
 [System.Serializable]
