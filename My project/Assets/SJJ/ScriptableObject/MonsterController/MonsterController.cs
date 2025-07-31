@@ -14,12 +14,10 @@ public class MonsterController : MonoBehaviour
     public static event MonsterDieEvent IsMonsterDie;
     public static event Action<MonsterController> OnMonsterCompletelyDestroyed;
 
-    //public static int staticmonsterIndex = 0;
 
     [Header("몬스터 식별 정보")]
-    public int stageNum = 1;     // 스테이지 번호 (예: 1)
-    public int MonsterIndex = 0;
-    public int count = 10; // 몬스터 개수
+    public (int, int, int) stage = (1, 0, 0);
+    public int count = 50; // 몬스터 개수
 
     #region Private Fields
 
@@ -34,7 +32,8 @@ public class MonsterController : MonoBehaviour
     }
     public void SetMonsterStats()
     {
-        GameManager.Instance.setMonster(new System.Tuple<int, int>(stageNum, MonsterIndex));
+        GameManager.Instance.setStage(new Tuple<int, int, int>(stage.Item1, stage.Item2, stage.Item3));
+        GameManager.Instance.setMonster(new Tuple<int, int, int>(stage.Item1, stage.Item2, stage.Item3));
         MonstermaxHP = GameManager.Instance.getMonsterMaxHP();
         MonstercurrentHP = GameManager.Instance.getMonsterHP();
         MonsterattackPower = GameManager.Instance.getMonsterATK();
@@ -51,7 +50,8 @@ public class MonsterController : MonoBehaviour
     }
     private void Die()
     {
-        Debug.Log($"[몬스터 사망] 스테이지 {stageNum}-{MonsterIndex}");
+        Debug.Log($"[몬스터 사망] 스테이지 {stage.Item1}-{stage.Item2}-{stage.Item3}");
+        // GameManager.instance.BeatMonster();
         if (IsMonsterDie != null)
             IsMonsterDie(this);
         // 0.5초 지연
