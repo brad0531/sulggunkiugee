@@ -515,7 +515,39 @@ public class GameManager : MonoBehaviour
 
     private int LoadScriptsdatas(int MainStage, bool isStart)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, $"Monster/Scripts/Boss_Stage{MainStage}_{(isStart ? "Start" : "End")}_script.csv");
+        string path;
+        if (MainStage == 0) //튜토리얼
+        {
+            path = Path.Combine(Application.streamingAssetsPath, $"Tutorial/Tutorial_Script.csv");
+
+            if (!File.Exists(path))
+            {
+                Debug.LogError($"대화 스크립트 CSV 파일을 찾을 수 없습니다: {path}");
+                return 1;
+            }
+
+            Scripts.First = new Tuple<int, bool>(MainStage, isStart);
+            Scripts.Second = new List<Tuple<string, string>>();
+
+            using (StreamReader sr = new StreamReader(path, Encoding.GetEncoding("euc-kr")))
+            {
+                sr.ReadLine(); // 첫 줄은 헤더이므로 건너뜀
+
+                while (!sr.EndOfStream)
+                {
+                    string line = sr.ReadLine();
+                    var values = utility.SplitCsvLine(line);
+                    if (values.Count >= 2)
+                    {
+                        Scripts.Second.Add(new Tuple<string, string>("김민승 선배", values[1]));
+                    }
+                }
+            }
+
+            Debug.Log($"대화 스크립트 CSV 로드 완료: {Scripts.Second.Count}개");
+            return 0;
+        }
+        path = Path.Combine(Application.streamingAssetsPath, $"Monster/Scripts/Boss_Stage{MainStage}_{(isStart ? "Start" : "End")}_script.csv");
 
         if (!File.Exists(path))
         {

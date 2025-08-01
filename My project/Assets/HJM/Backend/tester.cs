@@ -2,7 +2,14 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
-
+using System.Collections.Generic;
+using System.Text;
+using System.Linq;
+using System;
+using System.Data;
+using System.Linq.Expressions;
+using Unity.VisualScripting;
+using UnityEditor.Playables;
 public class tester : MonoBehaviour
 {
     public string filename;
@@ -30,7 +37,7 @@ public class tester : MonoBehaviour
 #else
         if (File.Exists(filePath))
         {
-            string content = File.ReadAllText(filePath);
+            string content = File.ReadAllText(filePath, Encoding.GetEncoding("euc-kr"));
             Debug.Log($"파일 내용:\n{content}");
         }
         else
@@ -44,5 +51,7 @@ public class tester : MonoBehaviour
     void Start()
     {
         ReadFileFromStreamingAssets(filename);
+
+        Debug.Log(GameManager.Instance.getScript(0, false, 0).ToString());
     }
 }
