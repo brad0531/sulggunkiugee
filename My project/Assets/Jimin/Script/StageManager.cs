@@ -30,7 +30,7 @@ public class StageManager : MonoBehaviour
     private List<GameObject> enemiesList = new List<GameObject>();
 
     private PlayerController playercontroller;
-    private Dialogue Dialogue;
+    public Dialogue dialogue;
 
     private IEnumerator PlayerRespawnDelay(float delay)
     {
@@ -56,6 +56,7 @@ public class StageManager : MonoBehaviour
     void TutorialSpawnMonster() 
     {
         PlayerRespawnDelay(delay);
+        StartCoroutine(dialogue.TutorialDialogue(index));
         enemiesList.Clear();
         Vector3 playerPosition = GameObject.FindWithTag("Player").transform.position;
         for (int i = 0; i < 50; i++)
@@ -81,7 +82,7 @@ public class StageManager : MonoBehaviour
 
         stage = GameManager.Instance.getStage();
         _currentStage = stage.Item1;
-        Dialogue.DialoguePrint(index, _currentStage);
+        StartCoroutine(dialogue.DialoguePrint(index, _currentStage));
     }
 
     void Respawn()
@@ -136,6 +137,7 @@ public class StageManager : MonoBehaviour
     {
         GameManager.Instance.setStage(stage);
         stage = GameManager.Instance.getStage();
+
         if (stage.Item1 == 0 && stage.Item2 == 0) //튜토리얼 스테이지가 0 - 0 이라고 할때
         {
             //SceneManager.LoadScene("Tutorial");
@@ -151,7 +153,6 @@ public class StageManager : MonoBehaviour
     {
 
         //Playerdying();
-
         // 튜토리얼
         if (stage.Item1 == 0 && stage.Item2 == 0)
         {
