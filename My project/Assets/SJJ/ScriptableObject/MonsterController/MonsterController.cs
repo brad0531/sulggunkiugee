@@ -16,7 +16,7 @@ public class MonsterController : MonoBehaviour
 
 
     [Header("몬스터 식별 정보")]
-    public (int, int, int) stage;
+    public (int, int, int) stage = (1, 0, 0);
     public int count = 50; // 몬스터 개수
 
     #region Private Fields
