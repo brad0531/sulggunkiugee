@@ -91,9 +91,10 @@ public class GameManager : MonoBehaviour
         UserData.MaxHP = UserData.HP = LoadHP_Per_Level(0);
         UserData.money = 1000000;
         UserData.liver = 0;
-        UserData.stage = new StageType<int, int, int>(1, 0, 0);
+        UserData.diamond = 0;
+        UserData.stage = new StageType<int, int, int>(0, 0, 0);
 
-        setMonster(new Tuple<int, int, int>(1, 0, 0));
+        setMonster(new Tuple<int, int, int>(0, 0, 0));
 
         for (int i = 0; i < 4; i++)
         {
@@ -501,6 +502,24 @@ public class GameManager : MonoBehaviour
 
             Monster_lists[stageKey] = value;
         }
+        //튜토리얼 몬스
+        for (int i = 0; i < 50; i++)
+        {
+            int stageA = 0;
+            int stageB = 0;
+            int stageC = i;
+
+            // Monster_H, Monster_D, Gold
+            int monsterH = i + 1;
+            int monsterD = 1;
+            int gold = i + 1;
+
+            var stageKey = Tuple.Create(stageA, stageB, stageC);
+            var value = Tuple.Create(monsterH, monsterD, gold);
+
+            Monster_lists[stageKey] = value;
+        }
+
         if (isTesting)
         {
             Debug.Log($"Normal Monster CSV 로드 완료: {Monster_lists.Count}개\n");
