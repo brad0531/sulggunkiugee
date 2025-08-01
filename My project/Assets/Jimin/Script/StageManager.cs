@@ -11,7 +11,7 @@ public class StageManager : MonoBehaviour
     public GameObject Monster;
     public GameObject Boss;
     public FadeInOut fadeEffect;
-    private PlayerController playercontroller;
+    
     public Tuple<int, int> stage = new Tuple<int, int>(0, 0); //gamemanager에서 Stage 받아오기용
 
     private GameObject enemy;
@@ -23,10 +23,14 @@ public class StageManager : MonoBehaviour
 
     private int _currentStage = 0;
     private int subStage = 0;
+    private int index = 0;
 
     public float delay = 0.5f;
 
     private List<GameObject> enemiesList = new List<GameObject>();
+
+    private PlayerController playercontroller;
+    private Dialogue Dialogue;
 
     private IEnumerator PlayerRespawnDelay(float delay)
     {
@@ -46,7 +50,7 @@ public class StageManager : MonoBehaviour
             enemiesList.Add(enemies);
         }
         isRespawning = false;
-        //playercontroller.Register
+        playercontroller.RegisterMonsters();
     }
 
     void TutorialSpawnMonster() 
@@ -74,7 +78,10 @@ public class StageManager : MonoBehaviour
         }
         BossMon = (GameObject)Instantiate(Boss, new Vector3(playerPosition.x + 1000, playerPosition.y), Quaternion.identity);
         isRespawning = false;
-        //대화 스크립트 출력
+
+        stage = GameManager.Instance.getStage();
+        _currentStage = stage.Item1;
+        Dialogue.DialoguePrint(index, _currentStage);
     }
 
     void Respawn()
