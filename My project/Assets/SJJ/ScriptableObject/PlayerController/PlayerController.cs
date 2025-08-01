@@ -94,8 +94,8 @@ public class PlayerController : MonoBehaviour
     public void RegisterMonsters()
     {
         var stageInfo = GameManager.Instance.getStage();
-        int mainStage = 1;   // 필요한 값으로 초기화
-        int subStage = 0;    // 필요한 값으로 초기화
+        int mainStage = 1;
+        int subStage = 0;
         int monsterIdx = 0;
 
         // 기존 몬스터 활성화
