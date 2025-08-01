@@ -25,7 +25,7 @@ public class StageBaseManager : MonoBehaviour
     public void StageMove(int Main, int Sub)
     {
         Debug.Log($"{Main}-{Sub}으로 이동하고 싶습니다.");
-        if (GameManager.Instance.UserData.Max_stage.Main > Main || (GameManager.Instance.UserData.Max_stage.Main == Main && GameManager.Instance.UserData.Max_stage.Sub > Sub))
+        if (GameManager.Instance.UserData.Max_stage.Main < Main || (GameManager.Instance.UserData.Max_stage.Main == Main && GameManager.Instance.UserData.Max_stage.Sub < Sub))
             return;
         GameManager.Instance.setStage(new Tuple<int, int, int> (Main, Sub, 0));
     }
