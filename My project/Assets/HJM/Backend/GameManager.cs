@@ -8,6 +8,7 @@ using System.Data;
 using System.Linq.Expressions;
 using Unity.VisualScripting;
 using UnityEditor.Playables;
+using Unity.Mathematics;
 public class GameManager : MonoBehaviour
 {
     private const long ONE_SECOND = 10000000;
@@ -28,6 +29,8 @@ public class GameManager : MonoBehaviour
     private Pair<Tuple<int, bool>, List<Tuple<string, string>>> Scripts = new Pair<Tuple<int, bool>, List<Tuple<string, string>>>(new Tuple<int, bool>(0, true), new List<Tuple<string, string>>());
     public List<List<int>> Info_Alcohol = new List<List<int>>();
     public List<List<int>> Snacks = new List<List<int>>();
+    public List<List<int>> Skill_Cost = new List<List<int>>();
+    public List<Pair<List<int>, List<int>>> Skill_Info = new List<Pair<List<int>, List<int>>>();
     private long Last_Save = 0;
     public long Save_Frequency = 1000000;
 
@@ -221,12 +224,11 @@ public class GameManager : MonoBehaviour
         int index = 0;
         using (StreamReader sr = new StreamReader(path))
         {
-            Debug.Log(sr.ReadLine());
+            sr.ReadLine();
             //첫 번째 행 index 패스
             while (!sr.EndOfStream)
             {
                 string line = sr.ReadLine();
-                Debug.Log($"{index} : {line}");
                 string[] values = line.Split(',');
                 foreach (string obj in values)
                 {
@@ -237,7 +239,7 @@ public class GameManager : MonoBehaviour
                     }
                     Info_Alcohol[index].Add(result);
                 }
-                Debug.Log($"{Info_Alcohol[index][0]} {Info_Alcohol[index][1]} {Info_Alcohol[index][2]} {Info_Alcohol[index][3]} {Info_Alcohol[index][4]}");
+
                 index++;
             }
         }
@@ -308,7 +310,6 @@ public class GameManager : MonoBehaviour
                 index++;
             }
         }
-
 
 
         if (isTesting)
@@ -455,14 +456,14 @@ public class GameManager : MonoBehaviour
             Debug.LogError($"Normal Monster 레벨별 CSV 파일을 찾을 수 없습니다: {path}\n");
             return 1;
         }
-        List<string> lines = new List<string> (File.ReadAllLines(path));
+        List<string> lines = new List<string>(File.ReadAllLines(path));
         path = Path.Combine(Application.streamingAssetsPath, "Monster/Boss_Monster.csv");
         if (!File.Exists(path))
         {
             Debug.LogError($"Boss Monster 레벨별 CSV 파일을 찾을 수 없습니다: {path}\n");
             return 1;
         }
-        List<string> tmp = new List<string> (File.ReadAllLines(path));
+        List<string> tmp = new List<string>(File.ReadAllLines(path));
         tmp.RemoveAt(0);
         lines.AddRange(tmp);
 
@@ -519,16 +520,6 @@ public class GameManager : MonoBehaviour
 
             Monster_lists[stageKey] = value;
         }
-
-        if (isTesting)
-        {
-            Debug.Log($"Normal Monster CSV 로드 완료: {Monster_lists.Count}개\n");
-            Debug.Log("=== Monster_lists 전체 출력 ===");
-            foreach (var kvp in Monster_lists)
-            {
-                Debug.Log($"Stage {kvp.Key} -> HP: {Monster_lists[kvp.Key].Item1}, ATK: {Monster_lists[kvp.Key].Item2}");
-            }
-        }
         return 0;
     }
 
@@ -562,8 +553,8 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
-
-            Debug.Log($"대화 스크립트 CSV 로드 완료: {Scripts.Second.Count}개");
+            if (isTesting)
+                Debug.Log($"대화 스크립트 CSV 로드 완료: {Scripts.Second.Count}개");
             return 0;
         }
         path = Path.Combine(Application.streamingAssetsPath, $"Monster/Scripts/Boss_Stage{MainStage}_{(isStart ? "Start" : "End")}_script.csv");
@@ -591,12 +582,98 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
-
-        Debug.Log($"대화 스크립트 CSV 로드 완료: {Scripts.Second.Count}개");
+        if (isTesting)
+            Debug.Log($"대화 스크립트 CSV 로드 완료: {Scripts.Second.Count}개");
         return 0;
     }
 
+    private int LoadSkillDatas()
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, "Skill/Cost_Skill.csv");
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"Skill Cost CSV 파일을 찾을 수 없습니다: {path}\n");
+            return 1;
+        }
 
+        Skill_Cost.Clear();
+        using (StreamReader sr = new StreamReader(path))
+        {
+            int index = 0;
+            sr.ReadLine(); //첫 번째 행 index 패스
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                string[] values = line.Split(',');
+                Skill_Cost.Add(new List<int>());
+                foreach (string obj in values)
+                {
+                    if (!int.TryParse(obj, out int result))
+                    {
+                        // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
+                        continue;
+                    }
+                    Skill_Cost[index].Add(result);
+                }
+
+                index++;
+            }
+        }
+        if (isTesting)
+            Debug.Log($"Skill Cost 관련 CSV 로드 완료");
+
+        path = Path.Combine(Application.streamingAssetsPath, "Skill/Skill.csv");
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"Skill CSV 파일을 찾을 수 없습니다: {path}\n");
+            return 1;
+        }
+
+        Skill_Info.Clear();
+        using (StreamReader sr = new StreamReader(path))
+        {
+            int index = 0;
+            sr.ReadLine(); //첫 번째 행 index 패스
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                string[] values = line.Split(',');
+                Skill_Info.Add(new Pair<List<int>, List<int>>());
+
+                for (int i = 1; i <= 10; i++)
+                {
+                    if (!int.TryParse(values[i], out int result))
+                    {
+                        // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
+                        continue;
+                    }
+                    Skill_Info[index].First.Add(result);
+                }
+
+                for (int i = 11; i < 13; i++)
+                {
+                    if (!int.TryParse(values[i], out int result))
+                    {
+                        // 변환 실패: int로 바꿀 수 없는 값이면 넘어감
+                        continue;
+                    }
+                    Skill_Info[index].Second.Add(result);
+                }
+
+                index++;
+            }
+        }
+        if (isTesting)
+            Debug.Log($"Skill info 관련 CSV 로드 완료::{Skill_Info.Count}개");
+
+        Skill_Cost.Add(new List<int>());
+        Skill_Cost[Skill_Cost.Count - 1].Add(5000);
+        Skill_Info.Add(new Pair<List<int>, List<int>>(new List<int>(), new List<int>()));
+        Skill_Info[Skill_Info.Count - 1].First.Add(120);
+        Skill_Info[Skill_Info.Count - 1].First.Add(240);  //임시 값 
+        Skill_Info[Skill_Info.Count - 1].Second.Add(40);
+        return 0;
+    }
 
     #endregion
 
@@ -654,6 +731,22 @@ public class GameManager : MonoBehaviour
     public int Load_Alcohol_Cost(Alcohol_index idx)
     {
         return Info_Alcohol[(int)idx][0];
+    }
+    public int Load_Skill_Cost(int index, int level)
+    {
+        if (level >= Skill_Cost[index].Count)
+            return -1; //이용 불가
+        return Skill_Cost[index][level];
+    }
+    public int Load_Skill_Damage(int index, int level)
+    {
+        if (level >= Skill_Info[index].First.Count)
+        {
+            Debug.LogError($"Skill Damage 인덱스 초과::{index},{level}");
+            return -1;
+        }
+
+        return Skill_Info[index].First[level];
     }
     #endregion
 
@@ -750,6 +843,16 @@ public class GameManager : MonoBehaviour
     {
         return UserData.ATK_speed;
     }
+
+    public int get_Skill_level(int index)
+    {
+        return UserData.skill_level[index];
+    }
+
+    public int getDiamond()
+    {
+        return UserData.diamond;
+    }
     #endregion
 
 
@@ -777,6 +880,10 @@ public class GameManager : MonoBehaviour
     public void setMoney(int money)
     {
         UserData.money = Math.Max(money, 0);
+    }
+    public void setDiamond(int diamond)
+    {
+        UserData.diamond = Math.Max(diamond, 0);
     }
     public void setLiver(int liver)
     {
@@ -871,9 +978,10 @@ public class GameManager : MonoBehaviour
     {
         return UserData.stage.ToStageTuple();
     }
-    
+
     //Main, Sub, index를 불러옵니다.
-    public Tuple<int, int, int> getAllStage() {
+    public Tuple<int, int, int> getAllStage()
+    {
         return UserData.stage.ToTuple();
     }
     public void setStage(Tuple<int, int> stage)
@@ -987,6 +1095,11 @@ public class GameManager : MonoBehaviour
             return true;
         return false;
     }
+
+    public int get_Skill_Cool(int index)
+    {
+        return Skill_Info[index].Second[0];
+    }
     #endregion
 
 }
@@ -1068,6 +1181,10 @@ public class Pair<T, U>
     public T First { get; set; }
     public U Second { get; set; }
 
+    public Pair()
+    {
+        
+    }
     public Pair(T first, U second)
     {
         First = first;
