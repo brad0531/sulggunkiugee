@@ -127,7 +127,11 @@ public class PlayerController : MonoBehaviour
             var ctrl = monsterObj.GetComponent<MonsterController>();
             if (ctrl != null)
             {
-                ctrl.stage = (mainStage, subStage, monsterIdx);
+                ctrl.mainStage = mainStage;
+                ctrl.subStage = subStage;
+                ctrl.monsterIndex = monsterIdx;
+                // 필요하면 스탯 재설정
+                ctrl.InitializeMonsterStats();
                 Debug.Log($"[Monster Registered] {monsterObj.name} at Stage {mainStage}_{subStage}_{monsterIdx}");
             }
             monsterIdx++;
@@ -186,7 +190,7 @@ public class PlayerController : MonoBehaviour
         int damage = _playerAttackPower;
 
         var ctrl = CurrentMonster.GetComponent<MonsterController>();
-        if (ctrl != null && !ctrl.IsDead())
+        if (ctrl != null && !ctrl.IsDead)
         {
             ctrl.MonsterTakeDamage(damage);
             Debug.Log($"[Player Attack] Damage={damage}, Monster HP={ctrl.GetCurrentHP()}");
@@ -211,7 +215,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         var ctrl = CurrentMonster.GetComponent<MonsterController>();
-        if (ctrl != null && !ctrl.IsDead())
+        if (ctrl != null && !ctrl.IsDead)
         {
             _playerHP = GameManager.Instance.getHP() - ctrl.GetATK();
             GameManager.Instance.setHP(_playerHP);

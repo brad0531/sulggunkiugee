@@ -14,11 +14,11 @@ public class MonsterSaveManager : MonoBehaviour
         {
             return new MonsterSaveData
             {
-                stage1 = mon.stage.Item1,
-                stage2 = mon.stage.Item2,
-                stage3 = mon.stage.Item3,
+                stage1 = mon.mainStage,
+                stage2 = mon.subStage,
+                stage3 = mon.monsterIndex,
                 hp = mon.GetCurrentHP(),
-                isDead = mon.IsDead()
+                isDead = mon.IsDead
             };
         }).ToArray();
 
@@ -43,9 +43,9 @@ public class MonsterSaveManager : MonoBehaviour
         foreach (var saved in wrapper.monsters)
         {
             var monster = allMonsters.FirstOrDefault(mon =>
-                mon.stage.Item1 == saved.stage1 &&
-                mon.stage.Item2 == saved.stage2 &&
-                mon.stage.Item3 == saved.stage3
+                mon.mainStage == saved.stage1 &&
+                mon.subStage == saved.stage2 &&
+                mon.monsterIndex == saved.stage3
             );
 
             if (monster != null)
@@ -53,7 +53,7 @@ public class MonsterSaveManager : MonoBehaviour
                 typeof(MonsterController).GetField("MonstercurrentHP", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                                          .SetValue(monster, saved.hp);
 
-                if (saved.isDead && !monster.IsDead())
+                if (saved.isDead && !monster.IsDead)
                 {
                     monster.MonsterTakeDamage(monster.GetCurrentHP());
                 }
