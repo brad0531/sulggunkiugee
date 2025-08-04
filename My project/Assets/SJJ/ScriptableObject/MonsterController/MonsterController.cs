@@ -1,86 +1,127 @@
 using System;
-using System.Collections.Generic;
-using NUnit.Framework;
-using NUnit.Framework.Internal;
-using UnityEditor.EditorTools;
-using UnityEngine;
 using System.Collections;
-using UnityEditor.Experimental.GraphView;
+using System.Collections.Generic;
+using UnityEngine;
 
-
+/// <summary>
+/// Handles monster stats, damage logic, death/respawn, and interaction with PlayerController.
+/// </summary>
 public class MonsterController : MonoBehaviour
 {
+    #region Events
     public delegate void MonsterDieEvent(MonsterController monster);
     public static event MonsterDieEvent IsMonsterDie;
     public static event Action<MonsterController> OnMonsterCompletelyDestroyed;
+    #endregion
 
-
+    #region Inspector Fields
     [Header("몬스터 식별 정보")]
-    public (int, int, int) stage = (1, 0, 0);
-    public int count = 50; // 몬스터 개수
+    [Tooltip("Monster의 Stage 정보 (Main, Sub, Index)")]
+    public int mainStage = 1;
+    public int subStage = 0;
+    public int monsterIndex = 0;
+
+    [Header("애니메이터")]
+    [SerializeField] private Animator animator;
+
+    [Header("몬스터 능력치")]
+    [SerializeField, Min(1)] private int defaultHP = 10;
+    [SerializeField, Min(1)] private int defaultATK = 1;
+    #endregion
 
     #region Private Fields
+    private int _currentHP;
+    private int _maxHP;
+    private int _attackPower;
 
-    private int MonstercurrentHP;
-    private int MonstermaxHP;
-    private int MonsterattackPower;
-
+    private bool _isDead;
     #endregion
-    void Start()
+
+    #region Properties
+    public bool IsDead => _isDead;
+    public int GetATK() => _attackPower;
+    public int GetCurrentHP() => _currentHP;
+    public int GetMaxHP() => _maxHP;
+    public (int, int, int) Stage => (mainStage, subStage, monsterIndex);
+    #endregion
+
+    #region Unity Callbacks
+    private void Awake()
     {
-        SetMonsterStats();
+        if (animator == null) animator = GetComponent<Animator>();
     }
-    public void SetMonsterStats()
+
+    private void Start()
     {
-        GameManager.Instance.setStage(new Tuple<int, int, int>(stage.Item1, stage.Item2, stage.Item3));
-        GameManager.Instance.setMonster(new Tuple<int, int, int>(stage.Item1, stage.Item2, stage.Item3));
-        MonstermaxHP = GameManager.Instance.getMonsterMaxHP();
-        MonstercurrentHP = GameManager.Instance.getMonsterHP();
-        MonsterattackPower = GameManager.Instance.getMonsterATK();
-        Debug.Log($"몬스터의 체력과 공격력을 불러옵니다. 현재 체력은 {MonstercurrentHP}, 공격력은 {MonsterattackPower}입니다.");
+        InitializeMonsterStats();
     }
+    #endregion
+
+    #region Initialization
+    public void InitializeMonsterStats()
+    {
+        // Stage/Monster 세팅 값으로 GameManager 동기화
+        GameManager.Instance.setStage(new Tuple<int, int, int>(mainStage, subStage, monsterIndex));
+        GameManager.Instance.setMonster(new Tuple<int, int, int>(mainStage, subStage, monsterIndex));
+        _maxHP = GameManager.Instance.getMonsterMaxHP();
+        _currentHP = GameManager.Instance.getMonsterHP();
+        _attackPower = GameManager.Instance.getMonsterATK();
+
+        if (_maxHP <= 0) _maxHP = defaultHP;
+        if (_currentHP <= 0) _currentHP = _maxHP;
+        if (_attackPower <= 0) _attackPower = defaultATK;
+
+        _isDead = false;
+
+        Debug.Log($"[Monster Stats] HP={_currentHP}/{_maxHP}, ATK={_attackPower}, Stage={mainStage}-{subStage}-{monsterIndex}");
+    }
+    #endregion
+
+    #region Combat & Damage
     public void MonsterTakeDamage(int damage)
     {
-        MonstercurrentHP -= damage;
-        MonstercurrentHP = Mathf.Max(0, MonstercurrentHP);
-        if (MonstercurrentHP <= 0)
-        {
-            Die();
-        }
+        if (_isDead) return;
+
+        _currentHP -= damage;
+        _currentHP = Mathf.Max(0, _currentHP);
+
+        Debug.Log($"[Monster Damaged] -{damage}, Remaining HP={_currentHP}, Stage={mainStage}-{subStage}-{monsterIndex}");
+
+        if (_currentHP <= 0) Die();
     }
+
     private void Die()
     {
-        Debug.Log($"[몬스터 사망] 스테이지 {stage.Item1}-{stage.Item2}-{stage.Item3}");
+        if (_isDead) return;
+        _isDead = true;
+
+        animator?.SetTrigger("Die");
+        Debug.Log($"[Monster Died] Stage {mainStage}-{subStage}-{monsterIndex}");
+
         GameManager.Instance.BeatMonster();
-        if (IsMonsterDie != null)
-            IsMonsterDie(this);
-        // 0.5초 지연
+        IsMonsterDie?.Invoke(this);
+
         StartCoroutine(DelayedInactivate(0.5f));
     }
+
     private IEnumerator DelayedInactivate(float delay)
     {
         yield return new WaitForSeconds(delay);
-        if (OnMonsterCompletelyDestroyed != null)
-            OnMonsterCompletelyDestroyed(this);
-
+        OnMonsterCompletelyDestroyed?.Invoke(this);
         gameObject.SetActive(false);
     }
-    public bool IsDead()
-    {
-        return MonstercurrentHP <= 0;
-    }
-    public int GetATK()
-    {
-        return MonsterattackPower;
-    }
+    #endregion
 
-    public int GetCurrentHP()
+    #region Public Methods (For External Call)
+    public void Respawn((int main, int sub, int idx) stageInfo)
     {
-        return MonstercurrentHP;
+        mainStage = stageInfo.main;
+        subStage = stageInfo.sub;
+        monsterIndex = stageInfo.idx;
+        InitializeMonsterStats();
+        if (animator != null) animator.Rebind();
+        gameObject.SetActive(true);
+        _isDead = false;
     }
-
-    public int GetMaxHP()
-    {
-        return MonstermaxHP;
-    }
+    #endregion
 }
