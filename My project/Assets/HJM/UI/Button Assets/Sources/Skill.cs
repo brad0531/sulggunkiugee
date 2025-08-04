@@ -12,22 +12,39 @@ public class Skill : MonoBehaviour
     public List<Text> ButtonText = new List<Text>();
     void Start()
     {
-        for (int i = 0; i < 8; i++)
+        foreach (Transform obj in parent)
         {
-            Text buttonText = parent.GetChild(i).GetComponentInChildren<Button>().GetComponent<Text>();
-            buttonText.text = getButtonText(i);
-            ButtonText.Add(buttonText);
-            Text Sub = parent.GetChild(i).GetComponentInChildren<Text>().GetComponent<Text>();
-            Sub.text = getSubText(i);
-            this.Sub.Add(Sub);
+            // Button 안의 Text 가져오기
+            Button button = obj.GetComponentInChildren<Button>();
+            if (button != null)
+            {
+                Text buttonText = button.GetComponentInChildren<Text>();
+                if (buttonText != null)
+                {
+                    buttonText.text = getButtonText(ButtonText.Count);
+                    ButtonText.Add(buttonText);
+                }
+            }
+
+            // Skill Panel의 자식 중 Button이 아닌 Text 가져오기
+            Text[] texts = obj.GetComponentsInChildren<Text>(true);
+            foreach (Text t in texts)
+            {
+                // 부모에 Button이 없으면 일반 Text로 처리
+                if (t.transform.parent.GetComponent<Button>() == null && t.transform.parent.GetComponent<Text>() != null)
+                {
+                    t.text = getSubText(Sub.Count);
+                    Sub.Add(t);
+                }
+            }
         }
-        
     }
     private string getButtonText(int index)
     {
+        Debug.Log($"{index}, {GameManager.Instance.get_Skill_level(index)}, {GameManager.Instance.Load_Skill_Cost(index, GameManager.Instance.get_Skill_level(index))}");
         string result = "";
         if (GameManager.Instance.Load_Skill_Cost(index, GameManager.Instance.get_Skill_level(index)) == -1)
-            result = "최대 레벨입니다.";
+            result = "최대 레벨";
         else
             result = $"다이아몬드 {GameManager.Instance.Load_Skill_Cost(index, GameManager.Instance.get_Skill_level(index))}개";
         return result;

@@ -18,6 +18,8 @@ public class UIController : MonoBehaviour
     private int Last_index;
     void Start()
     {
+        if (GameManager.Instance.getStage().Item1 != 0) //튜토리얼 스테이지가 아니면 이 코드는 동작할 필요가 없음
+            Destroy(this);
         Button[] allButtons = FindObjectsByType<Button>(FindObjectsSortMode.None);
         // 각 버튼의 GameObject를 리스트에 저장
         foreach (Button btn in allButtons)
@@ -66,6 +68,7 @@ public class UIController : MonoBehaviour
                 {
                     obj.GetComponent<Button>().interactable = true;
                 }
+                Destroy(this);
             }
         }
     }
