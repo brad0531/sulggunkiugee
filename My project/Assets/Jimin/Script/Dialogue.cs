@@ -10,6 +10,9 @@ public class Dialogue : MonoBehaviour
     public TMP_Text targetText;
     public TMP_Text targetName;
 
+    public TMP_Text TutorialText;
+    public TMP_Text TutorialName;
+
     public Tuple<int, int> stage;
 
     private float delay = 0.075f;
@@ -48,12 +51,12 @@ public class Dialogue : MonoBehaviour
         string speaker = script.Item1;
         string dialogue = script.Item2;
 
-        targetName.text = speaker;
-        targetText.text = "";
+        TutorialName.text = speaker;
+        TutorialText.text = "";
 
         for (int i = 0; i < dialogue.Length; i++)
         {
-            targetText.text += dialogue[i];
+            TutorialText.text += dialogue[i];
             yield return new WaitForSeconds(delay);
         }
 
@@ -134,7 +137,7 @@ public class Dialogue : MonoBehaviour
                     if (isTyping)
                     {
                         StopCoroutine(TutorialDialogue(index));
-                        targetText.text = dialogue;
+                        TutorialText.text = dialogue;
                         isTyping = false;
                     }
 
@@ -185,8 +188,8 @@ public class Dialogue : MonoBehaviour
                     string speaker = script.Item1;
                     string dialogue = script.Item2;
 
-                    targetName.text = "";
-                    targetText.text = "";
+                    TutorialText.text = "";
+                    TutorialName.text = "";
                 }
             }
         }
