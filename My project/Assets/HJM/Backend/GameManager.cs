@@ -82,6 +82,7 @@ public class GameManager : MonoBehaviour
         result += LoadMonsterdatas();
         result += Load_Alcohol_Info();
         result += Load_Snacks_Data();
+        result += LoadSkillDatas();
         result += LoadUserData();
         if (result > 0)
             Debug.LogError($"----------------------------------------\n데이터 불러오는 중 오류 발생 :: {result}개\n");
@@ -104,12 +105,12 @@ public class GameManager : MonoBehaviour
             UserData.status_levels.Add(0);
         }
 
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 8; i++)
         {
             UserData.skill_level.Add(0);
         }
 
-        for (int i = 0; i < 11; i++)
+        for (int i = 0; i < 12; i++) //11번째 인덱스는 소맥의 디버프를 기록하는 데에 사용됩니다.
         {
             UserData.effects.Add(0);
         }
@@ -619,8 +620,9 @@ public class GameManager : MonoBehaviour
                 index++;
             }
         }
+
         if (isTesting)
-            Debug.Log($"Skill Cost 관련 CSV 로드 완료");
+            Debug.Log($"Skill Cost 관련 CSV 로드 완료 :: {Skill_Cost[Skill_Cost.Count - 1][0]}개");
 
         path = Path.Combine(Application.streamingAssetsPath, "Skill/Skill.csv");
         if (!File.Exists(path))
@@ -638,7 +640,7 @@ public class GameManager : MonoBehaviour
             {
                 string line = sr.ReadLine();
                 string[] values = line.Split(',');
-                Skill_Info.Add(new Pair<List<int>, List<int>>());
+                Skill_Info.Add(new Pair<List<int>, List<int>>(new List<int>(), new List<int>()));
 
                 for (int i = 1; i <= 10; i++)
                 {
@@ -666,6 +668,7 @@ public class GameManager : MonoBehaviour
         if (isTesting)
             Debug.Log($"Skill info 관련 CSV 로드 완료::{Skill_Info.Count}개");
 
+        // 술 신 강 림
         Skill_Cost.Add(new List<int>());
         Skill_Cost[Skill_Cost.Count - 1].Add(5000);
         Skill_Info.Add(new Pair<List<int>, List<int>>(new List<int>(), new List<int>()));
@@ -1100,6 +1103,34 @@ public class GameManager : MonoBehaviour
     {
         return Skill_Info[index].Second[0];
     }
+
+    public void SetSoMacCool()
+    {
+        UserData.record.SoMacTime = utility.get_times();
+    }
+
+    public bool isSoMacCoolEnd()
+    {
+        double gap = (double)(utility.get_times() - UserData.record.SoMacTime) / (double)ONE_SECOND;
+
+        if (gap >= 1)
+            return true;
+
+        return false;
+    }
+
+    public void Skill_Use(int index)
+    {
+        UserData.skill_cooltime[index] = utility.get_times();
+    }
+
+    public bool isSkill_CoolTimeEnd(int index)
+    {
+        long gap = utility.get_times() - (long)UserData.skill_cooltime[index];
+        if (gap / ONE_SECOND >= (long)get_Skill_Cool(UserData.skill_set[index]))
+            return true;
+        return false;
+    }
     #endregion
 
 }
@@ -1124,7 +1155,10 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public StageType<int, int, int> stage;
     public StageType<int, int, int> Max_stage; //스테이지 최고 기록
     public long last_Attack;
+    public UserDataRecord record;
     public Monster monster = new Monster();
+    public List<int> skill_set = new List<int> { 0, 1, 2, 3 };
+    public List<long> skill_cooltime = new List<long>();
 }
 
 
@@ -1175,6 +1209,15 @@ public class GameUtility
 
 }
 #endregion
+
+[System.Serializable]
+public class UserDataRecord
+{
+    public int SoMac = 0;
+    public long SoMacTime = 0;
+    public int[] Soju_Record = { -1, 1, -1, 2, -1 };
+}
+
 [System.Serializable]
 public class Pair<T, U>
 {
