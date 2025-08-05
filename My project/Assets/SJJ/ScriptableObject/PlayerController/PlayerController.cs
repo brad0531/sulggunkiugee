@@ -217,6 +217,8 @@ public class PlayerController : MonoBehaviour
         var ctrl = CurrentMonster.GetComponent<MonsterController>();
         if (ctrl != null && !ctrl.IsDead)
         {
+            ctrl.MonsterAttackAnimation();
+
             _playerHP = GameManager.Instance.getHP() - ctrl.GetATK();
             GameManager.Instance.setHP(_playerHP);
             Debug.Log($"[Monster Attack] Damage={ctrl.GetATK()}, Player HP={_playerHP}");
@@ -229,11 +231,12 @@ public class PlayerController : MonoBehaviour
         _isMonsterAttacking = false;
     }
 
-    public void SkillActivate()
+    public void SkillActive(int index, int weight)
     {
-        /*
+        // 데미지 = 현재공격력 * 배수
+        // 7번 인덱스에 술신강림
+        // 8초 동안 준 데미지를 저장해서 n%의 데미지를 추가로 주는것.
         animator.SetTrigger("Skill");
-        */
     }
     #endregion
 

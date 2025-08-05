@@ -60,7 +60,6 @@ public class MonsterController : MonoBehaviour
     #region Initialization
     public void InitializeMonsterStats()
     {
-        // Stage/Monster 세팅 값으로 GameManager 동기화
         GameManager.Instance.setStage(new Tuple<int, int, int>(mainStage, subStage, monsterIndex));
         GameManager.Instance.setMonster(new Tuple<int, int, int>(mainStage, subStage, monsterIndex));
         _maxHP = GameManager.Instance.getMonsterMaxHP();
@@ -88,6 +87,11 @@ public class MonsterController : MonoBehaviour
         Debug.Log($"[Monster Damaged] -{damage}, Remaining HP={_currentHP}, Stage={mainStage}-{subStage}-{monsterIndex}");
 
         if (_currentHP <= 0) Die();
+    }
+
+    public void MonsterAttackAnimation()
+    {
+        animator?.SetTrigger("Attack");
     }
 
     private void Die()
