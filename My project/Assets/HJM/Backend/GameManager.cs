@@ -1103,6 +1103,34 @@ public class GameManager : MonoBehaviour
     {
         return Skill_Info[index].Second[0];
     }
+
+    public void SetSoMacCool()
+    {
+        UserData.record.SoMacTime = utility.get_times();
+    }
+
+    public bool isSoMacCoolEnd()
+    {
+        double gap = (double)(utility.get_times() - UserData.record.SoMacTime) / (double)ONE_SECOND;
+
+        if (gap >= 1)
+            return true;
+
+        return false;
+    }
+
+    public void Skill_Use(int index)
+    {
+        UserData.skill_cooltime[index] = utility.get_times();
+    }
+
+    public bool isSkill_CoolTimeEnd(int index)
+    {
+        long gap = utility.get_times() - (long)UserData.skill_cooltime[index];
+        if (gap / ONE_SECOND >= (long)get_Skill_Cool(UserData.skill_set[index]))
+            return true;
+        return false;
+    }
     #endregion
 
 }
@@ -1129,6 +1157,8 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public long last_Attack;
     public UserDataRecord record;
     public Monster monster = new Monster();
+    public List<int> skill_set = new List<int> { 0, 1, 2, 3 };
+    public List<long> skill_cooltime = new List<long>();
 }
 
 
@@ -1184,7 +1214,8 @@ public class GameUtility
 public class UserDataRecord
 {
     public int SoMac = 0;
-    public int [] Soju_Record = {-1, 1, -1, 2, -1};
+    public long SoMacTime = 0;
+    public int[] Soju_Record = { -1, 1, -1, 2, -1 };
 }
 
 [System.Serializable]

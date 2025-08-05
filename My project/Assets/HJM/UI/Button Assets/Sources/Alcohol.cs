@@ -1,3 +1,4 @@
+using UnityEditor.Playables;
 using UnityEngine;
 using UnityEngine.UI;
 public class Alcohol : MonoBehaviour
@@ -52,7 +53,12 @@ public class Alcohol : MonoBehaviour
 
         if (isAcrossed == 2) //소맥 활성화
         {
-            GameManager.Instance.UserData.record.SoMac++;
+            if(GameManager.Instance.UserData.record.SoMac < 5)
+                GameManager.Instance.UserData.record.SoMac++;
+            if (GameManager.Instance.UserData.record.SoMac == 1) //첫 번째 활성화
+            {
+                GameManager.Instance.SetSoMacCool();
+            }
         }
     }
 }

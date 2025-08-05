@@ -7,14 +7,17 @@ public class EffectUIManager : MonoBehaviour
 {
     public Transform parentPath;
     public List<Pair<Transform, int>> parentPanels = new List<Pair<Transform, int>>();
-
+    public Transform SoMac;
     void Start()
     {
         foreach (Transform child in parentPath)
         {
             if (child.GetComponent<Image>() != null)
             {
-                parentPanels.Add(new Pair<Transform, int>(child, parentPanels.Count));
+                if (child.name == "SoMac Panel")
+                    SoMac = child;
+                else
+                    parentPanels.Add(new Pair<Transform, int>(child, parentPanels.Count));
             }
         }
         Debug.Log($"효과 패널 {parentPanels.Count}개 발견하였습니다.");
@@ -38,6 +41,17 @@ public class EffectUIManager : MonoBehaviour
             parentPanels[i].First.gameObject.SetActive(GameManager.Instance.isEffectsOn((GameManager.Alcohol_index)parentPanels[i].Second));
         }
 
-        
+        if (GameManager.Instance.UserData.record.SoMac > 0) //소맥 활성화 상태
+        {
+            if (!SoMac.gameObject.activeInHierarchy)
+                SoMac.gameObject.SetActive(true);
+            if (GameManager.Instance.isSoMacCoolEnd())
+            {
+                GameManager.Instance.setLiver(GameManager.Instance.getLiver() + GameManager.Instance.UserData.record.SoMac);
+                GameManager.Instance.SetSoMacCool();
+            }
+        }
+            else if (SoMac.gameObject.activeInHierarchy)
+                SoMac.gameObject.SetActive(false);
     }
 }

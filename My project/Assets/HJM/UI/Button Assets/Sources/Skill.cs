@@ -15,10 +15,10 @@ public class Skill : MonoBehaviour
         foreach (Transform obj in parent)
         {
             // Button 안의 Text 가져오기
-            Button button = obj.GetComponentInChildren<Button>();
+            Button[] button = obj.GetComponentsInChildren<Button>(true);
             if (button != null)
             {
-                Text buttonText = button.GetComponentInChildren<Text>();
+                Text buttonText = button[1].GetComponentInChildren<Text>();
                 if (buttonText != null)
                 {
                     buttonText.text = getButtonText(ButtonText.Count);
@@ -41,7 +41,6 @@ public class Skill : MonoBehaviour
     }
     private string getButtonText(int index)
     {
-        Debug.Log($"{index}, {GameManager.Instance.get_Skill_level(index)}, {GameManager.Instance.Load_Skill_Cost(index, GameManager.Instance.get_Skill_level(index))}");
         string result = "";
         if (GameManager.Instance.Load_Skill_Cost(index, GameManager.Instance.get_Skill_level(index)) == -1)
             result = "최대 레벨";
