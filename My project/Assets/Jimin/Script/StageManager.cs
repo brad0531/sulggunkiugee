@@ -35,8 +35,8 @@ public class StageManager : MonoBehaviour
     private IEnumerator PlayerRespawnDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        _currentStage = Mathf.Max(1, _currentStage - 1);
-        GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
+        //_currentStage = Mathf.Max(1, _currentStage - 1);
+        //GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
         playercontroller.HandlePlayerRespawn();
     }
 

@@ -178,11 +178,13 @@ public class Dialogue : MonoBehaviour
             if (stage.Item1 == 0)
             {
                 HandleTutorialClick();
+                Debug.Log(stage.Item1);
             }
 
             if(stage.Item1 != 0)
             {
                 HandleClick();
+                Debug.Log(stage.Item1);
             }
 
             if (stage.Item1 == 0 && index == 38 && !isTyping)
