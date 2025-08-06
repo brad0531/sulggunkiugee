@@ -160,7 +160,6 @@ public class StageManager : MonoBehaviour
             if (tutorialClear == false && enemiesList.All(e => e != null && !e.activeSelf))
             {
                 FadeInOut.Fade(fadeEffect);
-                // 플레이어 리스폰 함수 호출 
                 TutorialSpawnMonster();
             }
 
@@ -178,14 +177,15 @@ public class StageManager : MonoBehaviour
             if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning) //몬스터가 비활성화 될 시
             {
                 isRespawning = true;
-                //GameManager.Instance.setStage(new Tuple<int, int>(stage+1, 0));
+                subStage++;
+                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, subStage));
                 Respawn();
             }
         }
    
         
 
-        else if (stage.Item2 == 5) 
+        else if (stage.Item1 <= 6 && stage.Item2 == 5) 
         {
             if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning )
             {
