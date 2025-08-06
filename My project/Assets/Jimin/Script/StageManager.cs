@@ -82,7 +82,7 @@ public class StageManager : MonoBehaviour
 
         stage = GameManager.Instance.getStage();
         _currentStage = stage.Item1;
-        StartCoroutine(dialogue.DialoguePrint(index, _currentStage));
+        StartCoroutine(dialogue.MainDialogue(index, _currentStage));
     }
 
     void Respawn()
