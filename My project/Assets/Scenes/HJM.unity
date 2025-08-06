@@ -389,7 +389,7 @@ GameObject:
   - component: {fileID: 57642704}
   - component: {fileID: 57642703}
   m_Layer: 5
-  m_Name: Skills (3)
+  m_Name: 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4870,7 +4870,7 @@ GameObject:
   - component: {fileID: 356628317}
   - component: {fileID: 356628316}
   m_Layer: 5
-  m_Name: Skills (1)
+  m_Name: 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4939,7 +4939,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 356628317}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 659500491}
+        m_TargetAssemblyTypeName: SkillManager, Assembly-CSharp
+        m_MethodName: onClick_SkillButton
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 356628315}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &356628317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8321,6 +8333,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 654709846}
   m_CullTransparentMesh: 1
+--- !u!1 &659500490
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 659500492}
+  - component: {fileID: 659500491}
+  m_Layer: 5
+  m_Name: SkillManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &659500491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659500490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4c24feeb3a141a43a9d5d01518c6f4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!224 &659500492
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659500490}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1494491451}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &660944504
 GameObject:
   m_ObjectHideFlags: 0
@@ -8594,7 +8654,7 @@ GameObject:
   - component: {fileID: 670645205}
   - component: {fileID: 670645204}
   m_Layer: 5
-  m_Name: Skills (2)
+  m_Name: 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8663,7 +8723,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 670645205}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 659500491}
+        m_TargetAssemblyTypeName: SkillManager, Assembly-CSharp
+        m_MethodName: onClick_SkillButton
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 670645203}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &670645205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11433,7 +11505,7 @@ GameObject:
   - component: {fileID: 885717412}
   - component: {fileID: 885717411}
   m_Layer: 5
-  m_Name: Skills (4)
+  m_Name: 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19759,6 +19831,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1297444648}
+  - {fileID: 659500492}
   - {fileID: 2008261971}
   m_Father: {fileID: 676712482}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
