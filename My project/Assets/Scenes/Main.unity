@@ -160,13 +160,17 @@ MonoBehaviour:
     skill_level: 
     money: 0
     liver: 0
+    diamond: 0
     effects: 
+    snack_times: 
     last_Attack: 0
     monster:
       MaxHP: 0
       HP: 0
       ATK: 0
+      Gold: 0
       last_Attack: 0
+  Skill_Info: []
   Save_Frequency: 100000000
 --- !u!4 &759752392
 Transform:

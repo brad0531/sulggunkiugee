@@ -187,26 +187,21 @@ public class StageManager : MonoBehaviour
 
         else if (stage.Item2 == 5) 
         {
-            if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning)
+            if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning )
             {
                 // 1-5
                 isRespawning = true;
                 BossSpawn();
-                _currentStage++;
-                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
+                if (!isRespawning && enemiesList.All(e => e != null && !e.activeSelf) && BossMon != null && !BossMon.activeSelf)
+                {
+                    _currentStage++;
+                    GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
+                    SceneManager.LoadScene("Stage" + _currentStage);
+                }
             }
             
         }
 
-        //BossStage Clear
-        /* else if (Stagelevel == 6)
-        {
-            if (!isRespawning && BossMon != null && !BossMon.activeSelf)
-            {
-                FadeInOut.Fade(fadeEffect);
-                SceneManager.LoadScene("Stage2");
-            }
-        } */
 
         // 해피엔딩
         if (stage.Item1 == 7 && stage.Item2 == 0)

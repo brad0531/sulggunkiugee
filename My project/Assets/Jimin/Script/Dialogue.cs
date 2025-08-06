@@ -4,13 +4,19 @@ using TMPro;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+
 
 public class Dialogue : MonoBehaviour
 {
+    // 지피티 안씀 
     public TMP_Text targetText;
     public TMP_Text targetName;
 
-    public Tuple<int, int> stage;
+    public TMP_Text TutorialText;
+    public TMP_Text TutorialName;
+
+    public Tuple<int, int> stage = new Tuple<int, int>(0, 0);
 
     private float delay = 0.075f;
     public int index = 0;
@@ -20,7 +26,7 @@ public class Dialogue : MonoBehaviour
     private bool isTyping = false;
 
     public IEnumerator DialoguePrint(int index, int m)
-    { 
+    {
         isTyping = true;
 
         var script = GameManager.Instance.getScript(m, true, index);
@@ -42,18 +48,17 @@ public class Dialogue : MonoBehaviour
     public IEnumerator TutorialDialogue(int index)
     {
         isTyping = true;
-        index = 0;
-
+        
         var script = GameManager.Instance.getScript(0, false, index);
         string speaker = script.Item1;
         string dialogue = script.Item2;
 
-        targetName.text = speaker;
-        targetText.text = "";
+        TutorialName.text = speaker;
+        TutorialText.text = "";
 
         for (int i = 0; i < dialogue.Length; i++)
         {
-            targetText.text += dialogue[i];
+            TutorialText.text += dialogue[i];
             yield return new WaitForSeconds(delay);
         }
 
@@ -88,72 +93,66 @@ public class Dialogue : MonoBehaviour
                 // ui 차단 해제
             }
         } */
-    } 
+    }
 
 
-    void ClickSkip()
+    void HandleTutorialClick()
     {
         stage = GameManager.Instance.getStage();
         int MainStage = stage.Item1;
 
-        if (Input.touchCount > 0)
+        var script = GameManager.Instance.getScript(0, false, index);
+        string name = script.Item1;
+        string dialogue = script.Item2;
+
+                
+        if (isTyping)
         {
-            Touch touchFirst = Input.GetTouch(0);
+             StopCoroutine(TutorialDialogue(index));
+             TutorialText.text = dialogue;
+             isTyping = false;
+             return;
+        }
 
-            if (MainStage != 0)
-            {
-                var script = GameManager.Instance.getScript(1, true, index);
-                string name = script.Item1;
-                string dialogue = script.Item2;
+        if (!isTyping)
+        {
+             if ((index >= 0 && index <= 4) || (index >= 6 && index <= 11) || (index >= 14 && index <= 37))
+             {
+                 index++;
+                 StartCoroutine(TutorialDialogue(index));
+             }
+        }
+                
+    }
 
-                if (touchFirst.phase == TouchPhase.Began)
-                {
-                    if (isTyping)
-                    {
-                        StopCoroutine(DialoguePrint(index, MainStage));
-                        targetText.text = dialogue;
-                        isTyping = false;
-                    }
+    void HandleClick()
+    {
 
-                    if (!isTyping)
-                    {
-                        index++;
-                        StartCoroutine(DialoguePrint(index, MainStage));
-                    }
-                }
-            }
+        stage = GameManager.Instance.getStage();
+  
+        var script = GameManager.Instance.getScript(1, true, index);
+        string name = script.Item1;
+        string dialogue = script.Item2;
 
-            if (MainStage == 0)
-            {
-                var script = GameManager.Instance.getScript(0, false, index);
-                string name = script.Item1;
-                string dialogue = script.Item2;
 
-                if (touchFirst.phase == TouchPhase.Began)
-                {
-                    if (isTyping)
-                    {
-                        StopCoroutine(TutorialDialogue(index));
-                        targetText.text = dialogue;
-                        isTyping = false;
-                    }
+        if (isTyping)
+        {
+            StopCoroutine(DialoguePrint(index, stage.Item1));
+            targetText.text = dialogue;
+            isTyping = false;
+            return;
+        }
 
-                    if (!isTyping)
-                    {
-                        if((index >= 0 && index <= 4) || (index >= 6 && index <= 11 ) || (index >= 14 && index <= 37)) 
-                        {
-                            index++;
-                            StartCoroutine(TutorialDialogue(index));
-                        }
-                    }
-                }
-            }
+        if (!isTyping)
+        {
+            index++;
+            StartCoroutine(DialoguePrint(index, stage.Item1));
         }
     }
 
     void Start()
     {
-        
+
     }
 
     private void Awake()
@@ -169,25 +168,31 @@ public class Dialogue : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        ClickSkip();
-
-        if (Input.touchCount > 0)
+        if ((Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame) ||
+            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame))
         {
-            Touch touchFirst = Input.GetTouch(0);
+            Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
 
-            if (touchFirst.phase == TouchPhase.Began)
+            if (stage.Item1 == 0)
             {
-                if (stage.Item1 == 0 && index == 38 && !isTyping)
-                {
-                    var script = GameManager.Instance.getScript(0, false, index);
-                    string speaker = script.Item1;
-                    string dialogue = script.Item2;
+                HandleTutorialClick();
+            }
 
-                    targetName.text = "";
-                    targetText.text = "";
-                }
+            if(stage.Item1 != 0)
+            {
+                HandleClick();
+            }
+
+            if (stage.Item1 == 0 && index == 38 && !isTyping)
+            {
+                var script = GameManager.Instance.getScript(0, false, index);
+                string speaker = script.Item1;
+                string dialogue = script.Item2;
+
+                TutorialText.text = "";
+                TutorialName.text = "";
             }
         }
     }
