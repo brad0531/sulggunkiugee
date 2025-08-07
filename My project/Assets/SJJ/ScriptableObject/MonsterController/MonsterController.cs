@@ -99,6 +99,7 @@ public class MonsterController : MonoBehaviour
         if (_isDead) return;
         _isDead = true;
 
+        animator.ResetTrigger("Attack");
         animator?.SetTrigger("Die");
         Debug.Log($"[Monster Died] Stage {mainStage}-{subStage}-{monsterIndex}");
 

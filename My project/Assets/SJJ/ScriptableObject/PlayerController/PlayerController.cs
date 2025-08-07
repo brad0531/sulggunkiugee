@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 
 /// <summary>
@@ -230,18 +231,45 @@ public class PlayerController : MonoBehaviour
         GameManager.Instance.MonsterAttack();
         _isMonsterAttacking = false;
     }
-
-    public void SkillActive(int index, int weight)
-    {
-        // 데미지 = 현재공격력 * 배수
-        // 7번 인덱스에 술신강림
-        // 8초 동안 준 데미지를 저장해서 n%의 데미지를 추가로 주는것.
-        animator.SetTrigger("Skill");
-    }
     #endregion
 
-    #region Utilities & Events
-    private float GetAnimationLength(string animName)
+
+
+    #region Skills
+
+    /// <summary>
+    /// 스킬 활성화 함수: 인덱스에 따라 일반/특수 스킬 처리
+    /// </summary>
+    /// <param name="index">스킬 번호 (0~6 일반, 7 술신강림)</param>
+    /// <param name="weight">데미지 가중치(퍼센트, 예: 150 = 1.5배)</param>
+    /// <param name="target">데미지를 입힐 대상 몬스터</param>
+    public void SkillActive(int index, int weight, MonsterController target)
+    {
+        if (target == null) return;
+
+        int main = target.mainStage;
+        int sub = target.subStage;
+        int idx = target.monsterIndex;
+
+        Debug.Log($"스킬 대상 몬스터 식별 정보 - Main: {main}, Sub: {sub}, Index: {idx}");
+
+        // 일반스킬
+        if (index >= 0 && index < 7)
+        {
+            double _skillPower = _playerAttackPower * (weight / 100.0);
+        }
+
+        // 술신강림
+        if (index == 7)
+        {
+
+        }
+    }
+
+    #endregion
+
+#region Utilities & Events
+private float GetAnimationLength(string animName)
     {
         foreach (var clip in animator.runtimeAnimatorController.animationClips)
             if (clip.name == animName)
