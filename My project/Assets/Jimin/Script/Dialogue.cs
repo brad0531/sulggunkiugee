@@ -20,12 +20,14 @@ public class Dialogue : MonoBehaviour
 
     private float delay = 0.075f;
     public int index = 0;
+    private float clickCooldown = 0.3f;
+    private float lastClickTime = 0;
 
     public static Dialogue Instance { get; private set; }
 
     private bool isTyping = false;
 
-    public IEnumerator DialoguePrint(int index, int m)
+    public IEnumerator MainDialogue(int index, int m)
     {
         isTyping = true;
 
@@ -97,10 +99,7 @@ public class Dialogue : MonoBehaviour
 
 
     void HandleTutorialClick()
-    {
-        stage = GameManager.Instance.getStage();
-        int MainStage = stage.Item1;
-
+    { 
         var script = GameManager.Instance.getScript(0, false, index);
         string name = script.Item1;
         string dialogue = script.Item2;
@@ -108,10 +107,11 @@ public class Dialogue : MonoBehaviour
                 
         if (isTyping)
         {
-             StopCoroutine(TutorialDialogue(index));
-             TutorialText.text = dialogue;
-             isTyping = false;
-             return;
+            //StopCoroutine(TutorialDialogue(index));
+            StopAllCoroutines();
+            TutorialText.text = dialogue;
+            isTyping = false;
+            return;
         }
 
         if (!isTyping)
@@ -122,7 +122,6 @@ public class Dialogue : MonoBehaviour
                  StartCoroutine(TutorialDialogue(index));
              }
         }
-                
     }
 
     void HandleClick()
@@ -137,7 +136,7 @@ public class Dialogue : MonoBehaviour
 
         if (isTyping)
         {
-            StopCoroutine(DialoguePrint(index, stage.Item1));
+            StopCoroutine(MainDialogue(index, stage.Item1));
             targetText.text = dialogue;
             isTyping = false;
             return;
@@ -146,7 +145,7 @@ public class Dialogue : MonoBehaviour
         if (!isTyping)
         {
             index++;
-            StartCoroutine(DialoguePrint(index, stage.Item1));
+            StartCoroutine(MainDialogue(index, stage.Item1));
         }
     }
 
@@ -170,29 +169,34 @@ public class Dialogue : MonoBehaviour
 
     void FixedUpdate()
     {
-        if ((Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame) ||
-            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame))
+        if (Time.time - lastClickTime > clickCooldown)
         {
-            Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
-
-            if (stage.Item1 == 0)
+            if ((Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame) ||
+            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame))
             {
-                HandleTutorialClick();
-            }
+                Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
 
-            if(stage.Item1 != 0)
-            {
-                HandleClick();
-            }
+                Debug.Log(stage.Item1);
 
-            if (stage.Item1 == 0 && index == 38 && !isTyping)
-            {
-                var script = GameManager.Instance.getScript(0, false, index);
-                string speaker = script.Item1;
-                string dialogue = script.Item2;
+                if (stage.Item1 == 0)
+                {
+                    HandleTutorialClick();
+                }
 
-                TutorialText.text = "";
-                TutorialName.text = "";
+                if (stage.Item1 != 0)
+                {
+                    HandleClick();
+                }
+
+                if (stage.Item1 == 0 && index == 38 && !isTyping)
+                {
+                    var script = GameManager.Instance.getScript(0, false, index);
+                    string speaker = script.Item1;
+                    string dialogue = script.Item2;
+
+                    TutorialText.text = "";
+                    TutorialName.text = "";
+                }
             }
         }
     }
