@@ -47,7 +47,7 @@ public class EffectUIManager : MonoBehaviour
                 SoMac.gameObject.SetActive(true);
             if (GameManager.Instance.isSoMacCoolEnd())
             {
-                GameManager.Instance.setLiver(GameManager.Instance.getLiver() + GameManager.Instance.UserData.record.SoMac);
+                GameManager.Instance.setLiver(GameManager.Instance.getLiver() + GameManager.Instance.UserData.record.SoMac * 5);
                 GameManager.Instance.SetSoMacCool();
             }
         }

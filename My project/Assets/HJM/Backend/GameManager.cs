@@ -11,10 +11,10 @@ using UnityEditor.Playables;
 using Unity.Mathematics;
 public class GameManager : MonoBehaviour
 {
-    private const long ONE_SECOND = 10000000;
+    public const long ONE_SECOND = 10000000;
     #region 데이터 선언
     private GameUtility utility = new GameUtility();
-    public static GameManager Instance { get; private set; }
+    public static GameManager Instance { get; set; }
     public bool isTesting = true; //나중에 이거 끄고 키는 것만 하면 로그 출력 제어할 수 있도록
     [Header("CSV 파일 상대 경로 (StreamingAssets 기준)")]
     public string UserData_FilePath = "UserData/UserData.json";
@@ -675,6 +675,7 @@ public class GameManager : MonoBehaviour
         Skill_Info[Skill_Info.Count - 1].First.Add(120);
         Skill_Info[Skill_Info.Count - 1].First.Add(240);  //임시 값 
         Skill_Info[Skill_Info.Count - 1].Second.Add(40);
+        Skill_Info[Skill_Info.Count - 1].Second.Add(1);
         return 0;
     }
 
@@ -1155,7 +1156,7 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public StageType<int, int, int> stage;
     public StageType<int, int, int> Max_stage; //스테이지 최고 기록
     public long last_Attack;
-    public UserDataRecord record;
+    public UserDataRecord record = new UserDataRecord();
     public Monster monster = new Monster();
     public List<int> skill_set = new List<int> { 0, 1, 2, 3 };
     public List<long> skill_cooltime = new List<long>();
