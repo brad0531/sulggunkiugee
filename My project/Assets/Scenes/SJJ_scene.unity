@@ -138,7 +138,7 @@ GameObject:
   - component: {fileID: 175886663}
   m_Layer: 0
   m_Name: Enemy UI_4
-  m_TagString: Monster
+  m_TagString: enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -555,7 +555,7 @@ GameObject:
   - component: {fileID: 583287156}
   m_Layer: 0
   m_Name: Enemy UI_5
-  m_TagString: Monster
+  m_TagString: enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -684,7 +684,7 @@ GameObject:
   - component: {fileID: 615884796}
   m_Layer: 0
   m_Name: Enemy UI_3
-  m_TagString: Monster
+  m_TagString: enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
