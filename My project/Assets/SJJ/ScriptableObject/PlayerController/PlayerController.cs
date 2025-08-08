@@ -227,13 +227,13 @@ public class PlayerController : MonoBehaviour
     private bool _isSulshinDamageReady = false;
     private Coroutine _sulshinCoroutine;
 
-    public void SkillActive(int index, int weight, int hitcount, MonsterController target)
+    public void SkillActive(int index, int weight, int hitcount)
     {
-        if (target == null) return;
+        if (CurrentMonster == null) return;
 
         if (index >= 0 && index < 7)
         {
-            StartCoroutine(RepeatedSkillAttack(weight, hitcount, target));
+            StartCoroutine(RepeatedSkillAttack(weight, hitcount));
         }
         else if (index == 7)
         {
@@ -246,18 +246,18 @@ public class PlayerController : MonoBehaviour
             else if (_isSulshinDamageReady)
             {
                 double finalDamage = _sulshinAccumulatedDamage * (weight / 100.0);
-                DealDamageToMonster(target.transform, (int)finalDamage, false);
+                DealDamageToMonster(CurrentMonster.transform, (int)finalDamage, false);
                 _isSulshinDamageReady = false;
                 _sulshinAccumulatedDamage = 0;
             }
         }
     }
-    private IEnumerator RepeatedSkillAttack(int weight, int hitcount, MonsterController target)
+    private IEnumerator RepeatedSkillAttack(int weight, int hitcount)
     {
         for (int i = 0; i < hitcount; i++)
         {
             double skillDamage = _playerAttackPower * (weight / 100.0);
-            DealDamageToMonster(target.transform, (int)skillDamage, false);
+            DealDamageToMonster(CurrentMonster.transform, (int)skillDamage, false);
             UpdateSulshinDamage(skillDamage);
 
             if (i < hitcount - 1)
