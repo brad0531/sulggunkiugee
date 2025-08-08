@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
 {
     #region Inspector Fields
     [Header("플레이어 스탯")]
-    [SerializeField, Min(0f)] private float moveSpeed = 500f;
+    [SerializeField, Min(0f)] private float moveSpeed = 350f;
     [SerializeField, Min(0f)] private float attackRange = 200f;
     [SerializeField, Min(0f)] private float moveDistanceAfterKill = 30f;
 
@@ -50,6 +50,8 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Unity Callbacks
+
+
     private void Start()
     {
         CSVloading();
@@ -205,6 +207,21 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Skills
+    public static PlayerController Instance { get; private set; }
+
+    private void Awake()
+    {
+        // 싱글턴(오브젝트가 중복되지 않고 하나만 존재하도록) 설정
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     private bool _isSulshinActive = false;
     private double _sulshinAccumulatedDamage = 0;
     private bool _isSulshinDamageReady = false;
