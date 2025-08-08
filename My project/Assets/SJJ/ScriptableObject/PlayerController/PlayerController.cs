@@ -204,6 +204,20 @@ public class PlayerController : MonoBehaviour
         GameManager.Instance.MonsterAttack();
         _isMonsterAttacking = false;
     }
+
+    private void DealDamageToMonster(Transform monster, int damage, bool isNormalAttack)
+    {
+        if (monster == null) return;
+
+        var ctrl = monster.GetComponent<MonsterController>();
+        if (ctrl != null && !ctrl.IsDead)
+        {
+            ctrl.MonsterTakeDamage(damage);
+            if (isNormalAttack && _isSulshinActive)
+                UpdateSulshinDamage(damage);
+        }
+    }
+
     #endregion
 
     #region Skills
@@ -290,19 +304,7 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Utilities & Events
-    private void DealDamageToMonster(Transform monster, int damage, bool isNormalAttack)
-    {
-        if (monster == null) return;
-
-        var ctrl = monster.GetComponent<MonsterController>();
-        if (ctrl != null && !ctrl.IsDead)
-        {
-            ctrl.MonsterTakeDamage(damage);
-            if (isNormalAttack && _isSulshinActive)
-                UpdateSulshinDamage(damage);
-        }
-    }
-
+ 
     private float GetAnimationLength(string animName)
     {
         foreach (var clip in animator.runtimeAnimatorController.animationClips)
