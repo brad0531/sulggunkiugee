@@ -164,12 +164,18 @@ MonoBehaviour:
     effects: 
     snack_times: 
     last_Attack: 0
+    record:
+      SoMac: 0
+      SoMacTime: 0
+      Soju_Record: ffffffff01000000ffffffff02000000ffffffff
     monster:
       MaxHP: 0
       HP: 0
       ATK: 0
       Gold: 0
       last_Attack: 0
+    skill_set: 00000000010000000200000003000000
+    skill_cooltime: 
   Skill_Info: []
   Save_Frequency: 100000000
 --- !u!4 &759752392
