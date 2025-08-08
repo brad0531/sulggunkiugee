@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using NUnit.Framework.Constraints;
+using Unity.Android.Types;
 using UnityEngine;
 
 /// <summary>
@@ -31,6 +32,7 @@ public class PlayerController : MonoBehaviour
     #region Private Fields
     private int _playerHP;
     private int _playerAttackPower;
+    private int _originalAttackPower; // 버프 해제를 위해 원본 저장
     private int _currentMonsterIndex;
     private int _currentStage;
     private Vector3 respawnPosition;
@@ -43,15 +45,8 @@ public class PlayerController : MonoBehaviour
     #region Properties
     public bool IsPlayerDead => _isPlayerDead;
 
-    private Transform CurrentMonster
-    {
-        get
-        {
-            if (_currentMonsterIndex < 0 || _currentMonsterIndex >= monsters.Count)
-                return null;
-            return monsters[_currentMonsterIndex];
-        }
-    }
+    private Transform CurrentMonster =>
+        (_currentMonsterIndex >= 0 && _currentMonsterIndex < monsters.Count) ? monsters[_currentMonsterIndex] : null;
     #endregion
 
     #region Unity Callbacks
@@ -64,8 +59,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (_isPlayerDead)
-            return;
+        if (_isPlayerDead) return;
 
         if (!_isPlayerAttacking)
             HandleMovement();
@@ -86,41 +80,30 @@ public class PlayerController : MonoBehaviour
     {
         _playerHP = GameManager.Instance.getHP();
         _playerAttackPower = GameManager.Instance.getATK();
-        Debug.Log($"[Player Stats] HP={_playerHP}, ATK={_playerAttackPower}");
-
-        respawnPosition = transform.position; // 스폰 위치 저장
-        Debug.Log($"[RespwanPoint] = {respawnPosition}");
+        _originalAttackPower = _playerAttackPower; // 버프 복원용 저장
+        respawnPosition = transform.position;
     }
 
     public void RegisterMonsters()
     {
-        var stageInfo = GameManager.Instance.getStage();
+        monsters.Clear();
+
+        var allMonsters = GameObject.FindGameObjectsWithTag("enemy");
+        Array.Sort(allMonsters, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
+
         int mainStage = 1;
         int subStage = 0;
         int monsterIdx = 0;
 
-        // 기존 몬스터 활성화
-        foreach (Transform monsterobj in monsters)
-            monsterobj.gameObject.SetActive(true);
-
-        // 몬스터 리스트 정렬 후 교체
-        var allMonsters = GameObject.FindGameObjectsWithTag("enemy");
-        Array.Sort(allMonsters, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
-
-        monsters.Clear();
-
         foreach (var monsterObj in allMonsters)
         {
-            // 현재 (mainStage, subStage, monsterIdx)가 유효한 스테이지인지 확인
+            // 유효한 스테이지인지 확인
             while (!GameManager.Instance.isVaildStage(new Tuple<int, int, int>(mainStage, subStage, monsterIdx)))
             {
                 monsterIdx = 0;
                 subStage++;
                 if (!GameManager.Instance.isVaildStage(new Tuple<int, int, int>(mainStage, subStage, monsterIdx)))
-                {
-                    Debug.LogWarning($"[Stage Load Failed] stage={mainStage}, sub={subStage}, idx={monsterIdx}");
                     return;
-                }
             }
 
             monsters.Add(monsterObj.transform);
@@ -131,9 +114,7 @@ public class PlayerController : MonoBehaviour
                 ctrl.mainStage = mainStage;
                 ctrl.subStage = subStage;
                 ctrl.monsterIndex = monsterIdx;
-                // 필요하면 스탯 재설정
                 ctrl.InitializeMonsterStats();
-                Debug.Log($"[Monster Registered] {monsterObj.name} at Stage {mainStage}_{subStage}_{monsterIdx}");
             }
             monsterIdx++;
         }
@@ -141,7 +122,6 @@ public class PlayerController : MonoBehaviour
         MonsterController.IsMonsterDie += OnMonsterDie;
         MonsterController.OnMonsterCompletelyDestroyed += OnMonsterDestroyed;
     }
-
     #endregion
 
     #region Movement & Attacks
@@ -164,9 +144,7 @@ public class PlayerController : MonoBehaviour
     private void TryPlayerAttack()
     {
         if (_isPlayerAttacking || CurrentMonster == null) return;
-
-        float distance = Vector3.Distance(CurrentMonster.position, transform.position);
-        if (!GameManager.Instance.canPlayerAttack() || distance > attackRange)
+        if (!GameManager.Instance.canPlayerAttack() || Vector3.Distance(CurrentMonster.position, transform.position) > attackRange)
             return;
 
         StartCoroutine(PlayerAttackSequence());
@@ -188,14 +166,7 @@ public class PlayerController : MonoBehaviour
     private void ApplyPlayerDamage()
     {
         _playerAttackPower = GameManager.Instance.getATK();
-        int damage = _playerAttackPower;
-
-        var ctrl = CurrentMonster.GetComponent<MonsterController>();
-        if (ctrl != null && !ctrl.IsDead)
-        {
-            ctrl.MonsterTakeDamage(damage);
-            Debug.Log($"[Player Attack] Damage={damage}, Monster HP={ctrl.GetCurrentHP()}");
-        }
+        DealDamageToMonster(CurrentMonster, _playerAttackPower, true);
         GameManager.Instance.PlayerAttack();
     }
 
@@ -233,43 +204,79 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-
-
     #region Skills
+    private bool _isSulshinActive = false;
+    private double _sulshinAccumulatedDamage = 0;
+    private bool _isSulshinDamageReady = false;
+    private Coroutine _sulshinCoroutine;
 
-    /// <summary>
-    /// 스킬 활성화 함수: 인덱스에 따라 일반/특수 스킬 처리
-    /// </summary>
-    /// <param name="index">스킬 번호 (0~6 일반, 7 술신강림)</param>
-    /// <param name="weight">데미지 가중치(퍼센트, 예: 150 = 1.5배)</param>
-    /// <param name="target">데미지를 입힐 대상 몬스터</param>
     public void SkillActive(int index, int weight, MonsterController target)
     {
         if (target == null) return;
 
-        int main = target.mainStage;
-        int sub = target.subStage;
-        int idx = target.monsterIndex;
-
-        Debug.Log($"스킬 대상 몬스터 식별 정보 - Main: {main}, Sub: {sub}, Index: {idx}");
-
-        // 일반스킬
         if (index >= 0 && index < 7)
         {
-            double _skillPower = _playerAttackPower * (weight / 100.0);
+            double skillDamage = _playerAttackPower * (weight / 100.0);
+            DealDamageToMonster(target.transform, (int)skillDamage, false);
+            UpdateSulshinDamage(skillDamage);
         }
-
-        // 술신강림
-        if (index == 7)
+        else if (index == 7)
         {
-
+            if (!_isSulshinActive && !_isSulshinDamageReady)
+            {
+                _isSulshinActive = true;
+                _sulshinAccumulatedDamage = 0;
+                _sulshinCoroutine = StartCoroutine(SulshinBuffRoutine());
+            }
+            else if (_isSulshinDamageReady)
+            {
+                double finalDamage = _sulshinAccumulatedDamage * (weight / 100.0);
+                DealDamageToMonster(target.transform, (int)finalDamage, false);
+                _isSulshinDamageReady = false;
+                _sulshinAccumulatedDamage = 0;
+            }
         }
     }
 
+    private void UpdateSulshinDamage(double damage)
+    {
+        if (_isSulshinActive)
+            _sulshinAccumulatedDamage += damage;
+    }
+
+    private IEnumerator SulshinBuffRoutine()
+    {
+        _originalAttackPower = _playerAttackPower; // 원본 저장
+        _playerAttackPower = (int)(_playerAttackPower * 1.2);
+
+        float timer = 0f;
+        while (timer < 8f)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        _playerAttackPower = _originalAttackPower; // 원래 값 복원
+        _isSulshinActive = false;
+        _isSulshinDamageReady = true;
+    }
     #endregion
 
-#region Utilities & Events
-private float GetAnimationLength(string animName)
+    #region Utilities & Events
+    private void DealDamageToMonster(Transform monster, int damage, bool isNormalAttack)
+    {
+        if (monster == null) return;
+
+        var ctrl = monster.GetComponent<MonsterController>();
+        if (ctrl != null && !ctrl.IsDead)
+        {
+            ctrl.MonsterTakeDamage(damage);
+            if (isNormalAttack && _isSulshinActive)
+                UpdateSulshinDamage(damage);
+        }
+    }
+
+    private float GetAnimationLength(string animName)
     {
         foreach (var clip in animator.runtimeAnimatorController.animationClips)
             if (clip.name == animName)
@@ -277,37 +284,24 @@ private float GetAnimationLength(string animName)
         return 1f;
     }
 
-    private void OnMonsterDie(MonsterController dead)
-    {
-        _isPlayerAttacking = false;
-    }
-
-    private void OnMonsterDestroyed(MonsterController dead)
-    {
-        _currentMonsterIndex++;
-        _isPlayerAttacking = false;
-    }
+    private void OnMonsterDie(MonsterController dead) => _isPlayerAttacking = false;
+    private void OnMonsterDestroyed(MonsterController dead) { _currentMonsterIndex++; _isPlayerAttacking = false; }
 
     private void HandlePlayerDeath()
     {
         if (_isPlayerDead) return;
         _isPlayerDead = true;
         animator.SetTrigger("Die");
-        Debug.Log("[Player Died]");
-
-        if (fadeInOut != null)
-        {
-            StartCoroutine(fadeInOut.FadeIn());
-        }
+        if (fadeInOut != null) StartCoroutine(fadeInOut.FadeIn());
         StartCoroutine(PlayerRespawnDelay(1.0f));
     }
 
     public void HandlePlayerRespawn()
     {
-        RegisterMonsters();                                         // 몬스터 재등록
-        _playerHP = GameManager.Instance.getMaxHP();               // HP 초기화
-        transform.position = respawnPosition;                      // 위치 복귀
-        _currentMonsterIndex = 0;                                  // 인덱스 초기화
+        RegisterMonsters();
+        _playerHP = GameManager.Instance.getMaxHP();
+        transform.position = respawnPosition;
+        _currentMonsterIndex = 0;
         _isPlayerDead = false;
     }
 
@@ -320,62 +314,30 @@ private float GetAnimationLength(string animName)
     }
     #endregion
 
-    #region csv데이터
+    #region CSV Data
     [System.Serializable]
-    public class ActData
-    {
-        public string Name;
-        public string Act;
-    }
-
+    public class ActData { public string Name; public string Act; }
     public List<ActData> Info_Acts = new List<ActData>();
 
-    public void CSVloading()
-    {
-       LoadActs();
-    }
+    public void CSVloading() => LoadActs();
 
     private int LoadActs()
     {
         string path = Path.Combine(Application.streamingAssetsPath, "Acts/act.csv");
         if (!File.Exists(path))
-        {
-            Debug.LogError($"Acts CSV 파일을 찾을 수 없습니다: {path}");
             return 1;
-        }
+
         using (StreamReader sr = new StreamReader(path))
         {
-            string header = sr.ReadLine(); // 헤더 건너띔 (Name,Act)
+            sr.ReadLine(); // 헤더
             while (!sr.EndOfStream)
             {
-                string line = sr.ReadLine();
-                string[] values = line.Split(',');
-
-                // 값 개수가 2개(Name, Act)라고 가정
+                string[] values = sr.ReadLine().Split(',');
                 if (values.Length < 2) continue;
-
-                ActData act = new ActData
-                {
-                    Name = values[0],
-                    Act = values[1]
-                };
-                Info_Acts.Add(act);
+                Info_Acts.Add(new ActData { Name = values[0], Act = values[1] });
             }
         }
-        Debug.Log($"Acts CSV를 성공적으로 불러왔습니다. 총 {Info_Acts.Count}개 로드됨.");
         return 0;
     }
-
-    private void ActiveAct(ActData act)
-    {
-        if (act == null) return;
-
-        Debug.Log($"이름: {act.Name}, 행위: {act.Act}");
-        if (act.Name == "Player" && act.Act == "idle")
-        {
-            // Idle
-        }
-    }
-}
-
     #endregion
+}
