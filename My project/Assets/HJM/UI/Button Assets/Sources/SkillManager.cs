@@ -18,7 +18,6 @@ public class SkillManager : MonoBehaviour
         if (!GameManager.Instance.isSkill_CoolTimeEnd(index))
             return;
         GameManager.Instance.Skill_Use(index);
-        
     }
 
     public void SwapPositionReady(int index, Sprite obj)
