@@ -752,6 +752,11 @@ public class GameManager : MonoBehaviour
 
         return Skill_Info[index].First[level];
     }
+
+    public int Load_Skill_HitCount(int index)
+    {
+        return Skill_Info[index].Second[1];
+    }
     #endregion
 
 

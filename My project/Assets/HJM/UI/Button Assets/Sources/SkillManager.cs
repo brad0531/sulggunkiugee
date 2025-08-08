@@ -18,7 +18,7 @@ public class SkillManager : MonoBehaviour
         if (!GameManager.Instance.isSkill_CoolTimeEnd(index))
             return;
         GameManager.Instance.Skill_Use(index);
-        PlayerController.Instance.SkillActive(index, GameManager.Instance.Load_Skill_Damage(index, GameManager.Instance.get_Skill_level(index)));
+        PlayerController.Instance.SkillActive(index, GameManager.Instance.Load_Skill_Damage(index, GameManager.Instance.get_Skill_level(index)), GameManager.Instance.Load_Skill_HitCount(index));
     }
 
     public void SwapPositionReady(int index, Sprite obj)
