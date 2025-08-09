@@ -113,6 +113,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < 12; i++) //11번째 인덱스는 소맥의 디버프를 기록하는 데에 사용됩니다.
         {
             UserData.effects.Add(0);
+            UserData.effects_cool.Add(0);
         }
 
         for (int i = 0; i < 7; i++)
@@ -1034,7 +1035,7 @@ public class GameManager : MonoBehaviour
 
     public bool isAlcoholCoolTimeEnd(Alcohol_index index)
     {
-        long gap = utility.get_times() - (long)UserData.effects[(int)index];
+        long gap = utility.get_times() - (long)UserData.effects_cool[(int)index];
         if (gap / ONE_SECOND >= (long)Info_Alcohol[(int)index][3])
             return true;
         return false;
@@ -1051,6 +1052,7 @@ public class GameManager : MonoBehaviour
     public void effects_on(int index)
     {
         UserData.effects[index] = utility.get_times();
+        UserData.effects_cool[index] = utility.get_times();
     }
 
     public bool isEffectsOn(Alcohol_index index)
@@ -1063,7 +1065,7 @@ public class GameManager : MonoBehaviour
 
     public int getRestAlcoholCoolTime(int index)
     {
-        long gap = utility.get_times() - (long)UserData.effects[(int)index];
+        long gap = utility.get_times() - (long)UserData.effects_cool[(int)index];
         return Math.Max(0, (int)(((long)Info_Alcohol[(int)index][3] - gap) / ONE_SECOND));
     }
 
@@ -1156,7 +1158,7 @@ public class UserData_type //세이브 및 로드할 데이터 json형태
     public List<int> status_levels = new List<int>(); //각 스탯 강화 레벨 기록
     public List<int> skill_level = new List<int>();
     public int money, liver, diamond = 0; //돈과 간 수치
-    public List<long> effects = new List<long>(); //술 버프, 디버프 시간 저장
+    public List<long> effects = new List<long>(), effects_cool = new List<long>(); //술 버프, 디버프 시간 저장
     public List<long> snack_times = new List<long>();
     public StageType<int, int, int> stage;
     public StageType<int, int, int> Max_stage; //스테이지 최고 기록

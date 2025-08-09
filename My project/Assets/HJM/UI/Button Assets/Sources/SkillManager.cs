@@ -1,13 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+using System;
+using System.Collections.Generic;
 public class SkillManager : MonoBehaviour
 {
+
     int goal = -1;
-    Sprite goal_img;
+    public List<Sprite> goal_img;
+    public List<Transform> Skill_Panels;
     public void onClick_SkillButton(Transform target)
     {
-        int index = int.Parse(target.name);
+        int index = int.Parse(target.name) - 1;
         if (goal != -1) //스킬 변경
         {
             SwapPosition(index, target.gameObject);
@@ -21,10 +24,9 @@ public class SkillManager : MonoBehaviour
         PlayerController.Instance.SkillActive(index, GameManager.Instance.Load_Skill_Damage(index, GameManager.Instance.get_Skill_level(index)), GameManager.Instance.Load_Skill_HitCount(index));
     }
 
-    public void SwapPositionReady(int index, Sprite obj)
+    public void SwapPositionReady(int index)
     {
         goal = index;
-        goal_img = obj;
     }
 
     public void SwapPosition(int index, GameObject target)
@@ -39,12 +41,20 @@ public class SkillManager : MonoBehaviour
         if (tmpindex != -1 && tmpindex != index)
             return;
         Image tmp = target.GetComponent<Image>();
-        tmp.sprite = goal_img;
+        tmp.sprite = goal_img[index];
         goal = -1;
     }
 
     public void SceneSwap()
     {
         goal = -1;
+    }
+
+    public void Start()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            Skill_Panels[i].GetComponent<Image>().sprite = goal_img[GameManager.Instance.UserData.skill_set[i]];
+        }
     }
 }
