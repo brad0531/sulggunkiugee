@@ -110,8 +110,8 @@ public class StageManager : MonoBehaviour
             if (stage.Item1 > 1 && stage.Item2 == 0)
             {
                 _currentStage = stage.Item1 - 1;
-                subStage = 5;
-                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, subStage));
+                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 5));
+                SceneMoving.Instance.MoveToStage();
             }
 
             // 1-0
@@ -140,7 +140,7 @@ public class StageManager : MonoBehaviour
 
         if (stage.Item1 == 0 && stage.Item2 == 0) //튜토리얼 스테이지가 0 - 0 이라고 할때
         {
-            //SceneManager.LoadScene("Tutorial");
+            SceneMoving.Instance.MoveToTutorial();
             TutorialSpawnMonster();
         }
         else
@@ -166,8 +166,8 @@ public class StageManager : MonoBehaviour
             if(tutorialClear == true)
             {
                 enemiesList.Clear();
-                _currentStage++;
-                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
+                GameManager.Instance.setStage(new Tuple<int, int>(1, 0));
+                SceneMoving.Instance.MoveToStage();
             }
         }
 
@@ -196,7 +196,7 @@ public class StageManager : MonoBehaviour
                 {
                     _currentStage++;
                     GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
-                    SceneManager.LoadScene("Stage" + _currentStage);
+                    SceneMoving.Instance.MoveToStage();
                 }
             }
             
@@ -206,14 +206,14 @@ public class StageManager : MonoBehaviour
         // 해피엔딩
         if (stage.Item1 == 7 && stage.Item2 == 0)
         {
-            SceneManager.LoadScene("HappyEnding");
+            SceneMoving.Instance.StartHappyEnding();
         }
 
         // 배드 엔딩
         int liver = GameManager.Instance.getLiver();
         if (liver >= 10000)
         {
-            SceneManager.LoadScene("BadEnding");
+            SceneMoving.Instance.StartBadEnding();
         }
     }
 }
