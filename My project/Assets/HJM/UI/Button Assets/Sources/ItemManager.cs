@@ -14,6 +14,7 @@ public class ItemManager : MonoBehaviour
         Debug.Log($"아이템 구매::{index} / 잔액 : {money - ItemCost[index]}");
 
         GameManager.Instance.setMoney(money - ItemCost[index]);
+
         if (index == 0) //숙취해소제
         {
             GameManager.Instance.UserData.record.SoMac = Math.Max(0, GameManager.Instance.UserData.record.SoMac - 1);
@@ -28,7 +29,7 @@ public class ItemManager : MonoBehaviour
             GameManager.Instance.setHP(GameManager.Instance.getHP() + (int)((double)GameManager.Instance.getMaxHP() * 0.05));
             for (int i = 0; i < 11; i++)
             {
-                GameManager.Instance.UserData.effects[i] -= GameManager.ONE_SECOND * 5; //10초 완화
+                GameManager.Instance.UserData.effects_cool[i] -= GameManager.ONE_SECOND * 5; //5초 완화
             }
         }
     }
