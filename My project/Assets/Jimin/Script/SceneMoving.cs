@@ -10,14 +10,14 @@ public class SceneMoving : MonoBehaviour
 
     public static SceneMoving Instance { get; private set; }
 
-    void MoveTDiamondDungeon()
+    public void MoveTDiamondDungeon()
     {
         currentScene = SceneManager.GetActiveScene();
         SceneManager.UnloadSceneAsync(currentScene);
         SceneManager.LoadScene("DIamondDungeon", LoadSceneMode.Additive);
     }
 
-    void MoveToStage()
+    public void MoveToStage()
     {
         stage = GameManager.Instance.getStage();
         currentScene = SceneManager.GetActiveScene();
@@ -25,21 +25,21 @@ public class SceneMoving : MonoBehaviour
         SceneManager.LoadScene("Stage" + stage.Item1, LoadSceneMode.Additive);
     }
 
-    void MoveToTutorial()
+    public void MoveToTutorial()
     {
         currentScene = SceneManager.GetActiveScene();
         SceneManager.UnloadSceneAsync(currentScene);
         SceneManager.LoadScene("Tutorial");
     }
 
-    void StartHappyEnding()
+    public void StartHappyEnding()
     {
         currentScene = SceneManager.GetActiveScene();
         SceneManager.UnloadSceneAsync(currentScene);
         SceneManager.LoadScene("HappyEnding");
     }
 
-    void StartBadEnding()
+    public void StartBadEnding()
     {
         currentScene = SceneManager.GetActiveScene();
         SceneManager.UnloadSceneAsync(currentScene);
