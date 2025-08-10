@@ -2,47 +2,40 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform target;                        // 따라갈 대상(캐릭터)
-    public Vector3 offset = new Vector3(1, 1, -1); // 카메라와 타겟 간 거리
-    public float followSpeed = 100f;                  // 따라가는 속도
-    public float defaultSize = 50f; // 카메라 사이즈 기본값 설정
+    public Transform target;                         // 따라갈 대상(캐릭터)
+    public Vector3 offset = new Vector3(1, -3.5f, -10); // UI와 겹치지 않게 y축 조정
+    public float followSpeed = 6f;                   // 부드럽게 따라가는 속도
+    public float defaultSize = 6f;                   // 카메라 기본 줌 크기
 
     private Camera cam;
 
-    private void Start()
-    {
-        Camera.main.targetTexture = null;
-        Awake();
-    }
     void Awake()
     {
         cam = GetComponent<Camera>();
-        cam.orthographicSize = defaultSize; // 카메라 사이즈 변경
-    }
-    void LateUpdate() // 가장 늦게 실행되는 업데이트, 떨림 제거
-    {
-        if (target == null) return;
-        FollowTarget();
-    }
+        cam.orthographicSize = defaultSize;
 
-    private void FollowTarget()
-    {
-        Vector3 desiredPosition = GetDesiredPosition();
-        MoveCamera(desiredPosition);
-    }
-    private Vector3 GetDesiredPosition()
-    {
+        // Player 태그를 가진 오브젝트를 자동으로 target으로 지정
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj != null)
         {
-            // x만 타겟 기준으로 따라가고, y/z는 offset을 유지
-            return new Vector3(
-                target.position.x + offset.x,
-                target.position.y + offset.y, // offset 유지
-                target.position.z + offset.z  // offset 유지
-            );
+            target = playerObj.transform;
+        }
+        else
+        {
+            Debug.LogWarning("CameraFollow: 'Player' 태그를 가진 오브젝트를 찾을 수 없습니다.");
         }
     }
-    private void MoveCamera(Vector3 desiredPosition)
+
+    void LateUpdate()
     {
+        if (target == null) return;
+
+        Vector3 desiredPosition = new Vector3(
+            target.position.x + offset.x,
+            target.position.y + offset.y,
+            offset.z
+        );
+
         transform.position = Vector3.Lerp(transform.position, desiredPosition, followSpeed * Time.deltaTime);
     }
 }

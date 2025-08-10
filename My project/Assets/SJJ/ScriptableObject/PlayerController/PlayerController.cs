@@ -15,9 +15,8 @@ public class PlayerController : MonoBehaviour
 {
     #region Inspector Fields
     [Header("플레이어 스탯")]
-    [SerializeField, Min(0f)] private float moveSpeed = 350f;
-    [SerializeField, Min(0f)] private float attackRange = 200f;
-    [SerializeField, Min(0f)] private float moveDistanceAfterKill = 30f;
+    [SerializeField, Min(0f)] private float moveSpeed = 3f;
+    [SerializeField, Min(0f)] private float attackRange = 1f;
 
     [Header("애니메이터")]
     [SerializeField] private Animator animator;
@@ -51,6 +50,20 @@ public class PlayerController : MonoBehaviour
 
     #region Unity Callbacks
 
+    private void Awake()
+    {
+        // 싱글턴(오브젝트가 중복되지 않고 하나만 존재하도록) 설정
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        //애니메이터 자동할당
+        if (animator == null) animator = GetComponent<Animator>();
+    }
 
     private void Start()
     {
@@ -160,8 +173,6 @@ public class PlayerController : MonoBehaviour
 
         yield return new WaitForSeconds(GetAnimationLength("Attack"));
         ApplyPlayerDamage();
-
-        transform.Translate(Vector3.right * moveDistanceAfterKill);
         _isPlayerAttacking = false;
     }
 
@@ -223,18 +234,7 @@ public class PlayerController : MonoBehaviour
     #region Skills
     public static PlayerController Instance { get; private set; }
 
-    private void Awake()
-    {
-        // 싱글턴(오브젝트가 중복되지 않고 하나만 존재하도록) 설정
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
+
 
     private bool _isSulshinActive = false;
     private double _sulshinAccumulatedDamage = 0;
