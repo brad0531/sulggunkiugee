@@ -105,6 +105,10 @@ public class PlayerController : MonoBehaviour
 
         var allMonsters = GameObject.FindGameObjectsWithTag("enemy");
         Array.Sort(allMonsters, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
+        for (int i = 0; i < allMonsters.Length; i++)
+        {
+            allMonsters[i].SetActive(true);
+        }
 
         int mainStage = 1;
         int subStage = 0;
@@ -320,9 +324,10 @@ public class PlayerController : MonoBehaviour
     {
         if (_isPlayerDead) return;
         _isPlayerDead = true;
+        animator.ResetTrigger("Attack");
         animator.SetTrigger("Die");
         if (fadeInOut != null) StartCoroutine(fadeInOut.FadeIn());
-        StartCoroutine(PlayerRespawnDelay(1.0f));
+        StartCoroutine(PlayerRespawnDelay(2.0f));
     }
 
     public void HandlePlayerRespawn()
