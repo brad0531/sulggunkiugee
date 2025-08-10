@@ -108,6 +108,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < 8; i++)
         {
             UserData.skill_level.Add(0);
+            UserData.skill_cooltime.Add(0);
         }
 
         for (int i = 0; i < 12; i++) //11번째 인덱스는 소맥의 디버프를 기록하는 데에 사용됩니다.
@@ -667,7 +668,7 @@ public class GameManager : MonoBehaviour
             }
         }
         if (isTesting)
-            Debug.Log($"Skill info 관련 CSV 로드 완료::{Skill_Info.Count}개");
+            Debug.Log($"Skill info 관련 CSV 로드 완료::{Skill_Info[3].Second.Count}개");
 
         // 술 신 강 림
         Skill_Cost.Add(new List<int>());

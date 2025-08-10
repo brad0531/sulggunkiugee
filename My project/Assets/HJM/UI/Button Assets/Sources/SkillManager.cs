@@ -16,6 +16,7 @@ public class SkillManager : MonoBehaviour
             SwapPosition(index, target.gameObject);
             return;
         }
+        
         if (GameManager.Instance.UserData.skill_set[index] == -1)
             return;
         if (!GameManager.Instance.isSkill_CoolTimeEnd(index))
@@ -32,16 +33,16 @@ public class SkillManager : MonoBehaviour
     public void SwapPosition(int index, GameObject target)
     {
         int tmpindex = -1;
-
         for (int i = 0; i < 4; i++)
         {
-            if (GameManager.Instance.UserData.skill_set[i] == index)
+            if (GameManager.Instance.UserData.skill_set[i] == goal)
                 tmpindex = i;
         }
         if (tmpindex != -1 && tmpindex != index)
             return;
         Image tmp = target.GetComponent<Image>();
-        tmp.sprite = goal_img[index];
+        tmp.sprite = goal_img[goal];
+        GameManager.Instance.UserData.skill_set[index] = goal;
         goal = -1;
     }
 
