@@ -15,6 +15,11 @@ public class DiamondDungeon : MonoBehaviour
     private float diamond;
 
     #endregion
+    private void Start()
+    {
+        diamond = GameManager.Instance.getDiamond();
+        Debug.Log($"[Diamond] = {diamond}");
+    }
     private void Update()
     {
         if (Time.time - _startTime >= measurementDuration)
