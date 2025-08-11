@@ -81,8 +81,7 @@ public class StageManager : MonoBehaviour
         isRespawning = false;
 
         stage = GameManager.Instance.getStage();
-        _currentStage = stage.Item1;
-        StartCoroutine(dialogue.MainDialogue(index, _currentStage));
+        StartCoroutine(dialogue.MainDialogue(index, stage.Item1));
     }
 
     void Respawn()
@@ -103,12 +102,15 @@ public class StageManager : MonoBehaviour
             if (stage.Item1 == 0) 
             {
                 FadeInOut.Fade(fadeEffect);
+                PlayerRespawnDelay(delay);
                 TutorialSpawnMonster();
             }
 
             // 튜토리얼, 1-0 제외 n-0
             if (stage.Item1 > 1 && stage.Item2 == 0)
             {
+                GameObject.FindWithTag("enemy").SetActive(false);
+                enemiesList.Clear();
                 _currentStage = stage.Item1 - 1;
                 GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 5));
                 SceneMoving.Instance.MoveToStage();
@@ -117,13 +119,15 @@ public class StageManager : MonoBehaviour
             // 1-0
             if (stage.Item1 == 1 && stage.Item2 == 0)
             {
+                GameObject.FindWithTag("enemy").SetActive(false);
                 enemiesList.Clear();
-                Respawn();
             } 
 
             // 튜토리얼 제외 n-1 ~ n-5
             if (stage.Item1 >= 1 && stage.Item2 >= 1 && stage.Item2 <= 5) 
             {
+                GameObject.FindWithTag("enemy").SetActive(false);
+                enemiesList.Clear();
                 subStage = stage.Item2 - 1;
                 GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, subStage));
             }
@@ -153,21 +157,25 @@ public class StageManager : MonoBehaviour
     {
 
         //Playerdying();
+
         // 튜토리얼
         if (stage.Item1 == 0 && stage.Item2 == 0)
         {
 
-            if (tutorialClear == false && enemiesList.All(e => e != null && !e.activeSelf))
+            if (!tutorialClear && enemiesList.All(e => e != null && !e.activeSelf))
             {
+                enemiesList.Clear();
                 FadeInOut.Fade(fadeEffect);
                 TutorialSpawnMonster();
             }
 
-            if(tutorialClear == true)
+            if(tutorialClear)
             {
+                GameObject.FindWithTag("enemy").SetActive(false);
                 enemiesList.Clear();
                 GameManager.Instance.setStage(new Tuple<int, int>(1, 0));
                 SceneMoving.Instance.MoveToStage();
+                Respawn();
             }
         }
 
@@ -176,7 +184,7 @@ public class StageManager : MonoBehaviour
         {
             if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning) //몬스터가 비활성화 될 시
             {
-                isRespawning = true;
+                enemiesList.Clear();
                 subStage++;
                 GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, subStage));
                 Respawn();
@@ -189,14 +197,23 @@ public class StageManager : MonoBehaviour
         {
             if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning )
             {
-                // 1-5
-                isRespawning = true;
+                // n-5
+                FadeInOut.Fade(fadeEffect);
+                GameObject.FindWithTag("enemy").SetActive(false);
+                enemiesList.Clear();
+
+                PlayerRespawnDelay(delay);
                 BossSpawn();
                 if (!isRespawning && enemiesList.All(e => e != null && !e.activeSelf) && BossMon != null && !BossMon.activeSelf)
                 {
                     _currentStage++;
                     GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
-                    SceneMoving.Instance.MoveToStage();
+
+                    if(_currentStage != 7)
+                    {
+                        SceneMoving.Instance.MoveToStage();
+                    }
+                    
                 }
             }
             
