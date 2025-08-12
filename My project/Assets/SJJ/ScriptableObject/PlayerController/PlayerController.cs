@@ -247,8 +247,9 @@ public class PlayerController : MonoBehaviour
 
     public void SkillActive(int index, int weight, int hitcount)
     {
+        Debug.Log("스킬이 실행은 되는데 니 알아서 문제를 찾으세요.");
         if (CurrentMonster == null)
-        {
+        {   
             Debug.Log("몬스터가 사정거리 내에 없습니다.");
             return;
         }
