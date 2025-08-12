@@ -6,7 +6,7 @@ public class MoneyShower : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        money.text = $"{GameManager.Instance.getMoney()}골드";
-        liver.text = $"간수치 : {GameManager.Instance.getLiver()}";
+        money.text = $"{GameManager.Instance.getMoney()}";
+        liver.text = $"{GameManager.Instance.getLiver()}";
     }
 }

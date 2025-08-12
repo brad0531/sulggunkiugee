@@ -283,7 +283,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1894297038}
   - component: {fileID: 1894297037}
-  - component: {fileID: 1894297039}
   - component: {fileID: 1894297040}
   m_Layer: 0
   m_Name: AudioManager
@@ -307,6 +306,12 @@ MonoBehaviour:
   bgmSource: {fileID: 1894297040}
   bgmSources:
   - {fileID: 8300000, guid: 8b737811edfe99e4a8dbd96346b7ed21, type: 3}
+  - {fileID: 8300000, guid: 7977541bbeb14b94e94bf6a533911823, type: 3}
+  - {fileID: 8300000, guid: cb5a413aacd38a845960d2bec5a5f190, type: 3}
+  - {fileID: 8300000, guid: 8b737811edfe99e4a8dbd96346b7ed21, type: 3}
+  - {fileID: 8300000, guid: 7977541bbeb14b94e94bf6a533911823, type: 3}
+  - {fileID: 8300000, guid: cb5a413aacd38a845960d2bec5a5f190, type: 3}
+  - {fileID: 8300000, guid: 8b737811edfe99e4a8dbd96346b7ed21, type: 3}
   sfxPoolSize: 10
   masterVolume: 1
   bgmVolume: 1
@@ -327,14 +332,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!81 &1894297039
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1894297036}
-  m_Enabled: 1
 --- !u!82 &1894297040
 AudioSource:
   m_ObjectHideFlags: 0

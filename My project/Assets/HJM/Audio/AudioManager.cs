@@ -11,7 +11,13 @@ public class AudioManager : MonoBehaviour
 
     public enum BGMSound
     {
-        Main
+        Stage0,
+        Stage1,
+        Stage2,
+        Stage3,
+        Stage4,
+        Stage5,
+        Stage6
     };
     public static AudioManager Instance;
 
@@ -50,7 +56,7 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
-        PlayBGM(BGMSound.Main);
+        PlayBGM((BGMSound)GameManager.Instance.getStage().Item1);
     }
 
     private void InitSFXPool()

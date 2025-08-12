@@ -997,6 +997,10 @@ public class GameManager : MonoBehaviour
     }
     public void setStage(Tuple<int, int> stage)
     {
+        if (getStage().Item1 != stage.Item1) //메인 스테이지 변경 시
+        {
+            AudioManager.Instance.ChangeBGM((AudioManager.BGMSound)stage.Item1);
+        }
         UserData.stage = new StageType<int, int, int>(stage);
         if (UserData.stage.Main > UserData.Max_stage.Main)
             UserData.Max_stage = UserData.stage;
@@ -1005,6 +1009,10 @@ public class GameManager : MonoBehaviour
     }
     public void setStage(Tuple<int, int, int> stage)
     {
+        if (getStage().Item1 != stage.Item1) //메인 스테이지 변경 시
+        {
+            AudioManager.Instance.ChangeBGM((AudioManager.BGMSound)stage.Item1);
+        }
         UserData.stage = new StageType<int, int, int>(stage);
         if (UserData.stage.Main > UserData.Max_stage.Main)
             UserData.Max_stage = UserData.stage;
