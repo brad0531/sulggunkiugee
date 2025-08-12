@@ -183,7 +183,7 @@ public class PlayerController : MonoBehaviour
     private void ApplyPlayerDamage()
     {
         _playerAttackPower = GameManager.Instance.getATK();
-        DealDamageToMonster(CurrentMonster, _playerAttackPower, true);
+        DealDamageToMonster(CurrentMonster, _playerAttackPower);
         GameManager.Instance.PlayerAttack();
     }
 
@@ -220,7 +220,7 @@ public class PlayerController : MonoBehaviour
         _isMonsterAttacking = false;
     }
 
-    private void DealDamageToMonster(Transform monster, int damage, bool isNormalAttack)
+    private void DealDamageToMonster(Transform monster, int damage)
     {
         if (monster == null) return;
 
@@ -228,7 +228,7 @@ public class PlayerController : MonoBehaviour
         if (ctrl != null && !ctrl.IsDead)
         {
             ctrl.MonsterTakeDamage(damage);
-            if (isNormalAttack && _isSulshinActive)
+            if (_isSulshinActive)
                 UpdateSulshinDamage(damage);
         }
     }
@@ -264,7 +264,7 @@ public class PlayerController : MonoBehaviour
             else if (_isSulshinDamageReady)
             {
                 double finalDamage = _sulshinAccumulatedDamage * (weight / 100.0);
-                DealDamageToMonster(CurrentMonster.transform, (int)finalDamage, false);
+                DealDamageToMonster(CurrentMonster.transform, (int)finalDamage);
                 _isSulshinDamageReady = false;
                 _sulshinAccumulatedDamage = 0;
             }
@@ -275,7 +275,7 @@ public class PlayerController : MonoBehaviour
         for (int i = 0; i < hitcount; i++)
         {
             double skillDamage = _playerAttackPower * (weight / 100.0);
-            DealDamageToMonster(CurrentMonster.transform, (int)skillDamage, false);
+            DealDamageToMonster(CurrentMonster.transform, (int)skillDamage);
             UpdateSulshinDamage(skillDamage);
 
             if (i < hitcount - 1)

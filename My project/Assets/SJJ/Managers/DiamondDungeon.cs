@@ -31,11 +31,15 @@ public class DiamondDungeon : MonoBehaviour
             float performancePercent = (dps / baseDps) * 100f;
             diamond = (int)(_totalDamage / diamondPercentage);
         }
+        else if (Time.time - _startTime >= measurementDuration && !_isMeasuring)
+        {
+            _isMeasuring = true;
+            AddDiamond();
+        }
     }
 
     private void AddDiamond()
     {
         GameManager.Instance.setDiamond(GameManager.Instance.getDiamond() + diamond);
-
     }
 }
