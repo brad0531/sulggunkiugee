@@ -12,7 +12,7 @@ public class DiamondDungeon : MonoBehaviour
     private float _startTime;
     private float _totalDamage;
     private bool _isMeasuring;
-    private float diamond;
+    private int diamond;
 
     #endregion
     private void Start()
@@ -29,7 +29,13 @@ public class DiamondDungeon : MonoBehaviour
             float dps = _totalDamage / elapsed;
             float baseDps = baseDamage / baseTime;
             float performancePercent = (dps / baseDps) * 100f;
-            diamond = _totalDamage / diamondPercentage;
+            diamond = (int)(_totalDamage / diamondPercentage);
         }
-    }   
+    }
+
+    private void AddDiamond()
+    {
+        GameManager.Instance.setDiamond(GameManager.Instance.getDiamond() + diamond);
+
+    }
 }
