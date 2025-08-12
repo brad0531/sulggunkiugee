@@ -11,7 +11,7 @@ public class AudioManager : MonoBehaviour
 
     public enum BGMSound
     {
-
+        Main
     };
     public static AudioManager Instance;
 
@@ -47,6 +47,12 @@ public class AudioManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    void Start()
+    {
+        PlayBGM(BGMSound.Main);
+    }
+
     private void InitSFXPool()
     {
         sfxPool = new List<AudioSource>();
