@@ -41,7 +41,10 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
-
+    void Start()
+    {
+        
+    }
     private void Awake()
     {
         // 싱글턴(오브젝트가 중복되지 않고 하나만 존재하도록) 설정
@@ -1000,6 +1003,13 @@ public class GameManager : MonoBehaviour
         if (getStage().Item1 != stage.Item1) //메인 스테이지 변경 시
         {
             AudioManager.Instance.ChangeBGM((AudioManager.BGMSound)stage.Item1);
+            UserData.stage = new StageType<int, int, int>(stage);
+            if (UserData.stage.Main > UserData.Max_stage.Main)
+                UserData.Max_stage = UserData.stage;
+            else if (UserData.stage.Main == UserData.Max_stage.Main && UserData.stage.Sub > UserData.Max_stage.Sub)
+                UserData.Max_stage = UserData.stage;
+            SceneMoving.Instance.MoveToStage();
+            return;
         }
         UserData.stage = new StageType<int, int, int>(stage);
         if (UserData.stage.Main > UserData.Max_stage.Main)
@@ -1012,6 +1022,13 @@ public class GameManager : MonoBehaviour
         if (getStage().Item1 != stage.Item1) //메인 스테이지 변경 시
         {
             AudioManager.Instance.ChangeBGM((AudioManager.BGMSound)stage.Item1);
+            UserData.stage = new StageType<int, int, int>(stage);
+            if (UserData.stage.Main > UserData.Max_stage.Main)
+                UserData.Max_stage = UserData.stage;
+            else if (UserData.stage.Main == UserData.Max_stage.Main && UserData.stage.Sub > UserData.Max_stage.Sub)
+                UserData.Max_stage = UserData.stage;
+            SceneMoving.Instance.MoveToStage();
+            return;
         }
         UserData.stage = new StageType<int, int, int>(stage);
         if (UserData.stage.Main > UserData.Max_stage.Main)
