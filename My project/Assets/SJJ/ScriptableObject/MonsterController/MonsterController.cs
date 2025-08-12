@@ -29,7 +29,7 @@ public class MonsterController : MonoBehaviour
     [SerializeField, Min(1)] private int defaultATK = 1;
     #endregion
 
-    #region Private Fields
+    #region Monster stats
     private int _currentHP;
     private int _maxHP;
     private int _attackPower;
@@ -128,5 +128,11 @@ public class MonsterController : MonoBehaviour
         gameObject.SetActive(true);
         _isDead = false;
     }
+    
+    public void SaveMonsterHp()
+    {
+        GameManager.Instance.setMonsterHP(GetCurrentHP());
+    }
     #endregion
+
 }

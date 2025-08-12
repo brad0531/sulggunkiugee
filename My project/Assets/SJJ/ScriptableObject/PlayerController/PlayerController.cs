@@ -247,11 +247,17 @@ public class PlayerController : MonoBehaviour
 
     public void SkillActive(int index, int weight, int hitcount)
     {
-        if (CurrentMonster == null) return;
+        if (CurrentMonster == null)
+        {
+            Debug.Log("몬스터가 사정거리 내에 없습니다.");
+            return;
+        }
+        
 
         if (index >= 0 && index < 7)
         {
             StartCoroutine(RepeatedSkillAttack(weight, hitcount));
+            Debug.Log($"[Skill index] = {index}");
         }
         else if (index == 7)
         {
@@ -270,26 +276,26 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    private IEnumerator RepeatedSkillAttack(int weight, int hitcount)
+    public IEnumerator RepeatedSkillAttack(int weight, int hitcount)
     {
         for (int i = 0; i < hitcount; i++)
         {
             double skillDamage = _playerAttackPower * (weight / 100.0);
             DealDamageToMonster(CurrentMonster.transform, (int)skillDamage);
             UpdateSulshinDamage(skillDamage);
-
+            
             if (i < hitcount - 1)
                 yield return new WaitForSeconds(0.2f);
         }
     }
 
-    private void UpdateSulshinDamage(double damage)
+    public void UpdateSulshinDamage(double damage)
     {
         if (_isSulshinActive)
             _sulshinAccumulatedDamage += damage;
     }
 
-    private IEnumerator SulshinBuffRoutine()
+    public IEnumerator SulshinBuffRoutine()
     {
         _originalAttackPower = _playerAttackPower; // 원본 저장
         _playerAttackPower = (int)(_playerAttackPower * 1.2);
