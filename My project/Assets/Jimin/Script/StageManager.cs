@@ -144,7 +144,6 @@ public class StageManager : MonoBehaviour
 
         if (stage.Item1 == 0 && stage.Item2 == 0) //튜토리얼 스테이지가 0 - 0 이라고 할때
         {
-            SceneMoving.Instance.MoveToTutorial();
             TutorialSpawnMonster();
         }
         else
@@ -217,20 +216,6 @@ public class StageManager : MonoBehaviour
                 }
             }
             
-        }
-
-
-        // 해피엔딩
-        if (stage.Item1 == 7 && stage.Item2 == 0)
-        {
-            SceneMoving.Instance.StartHappyEnding();
-        }
-
-        // 배드 엔딩
-        int liver = GameManager.Instance.getLiver();
-        if (liver >= 10000)
-        {
-            SceneMoving.Instance.StartBadEnding();
         }
     }
 }
