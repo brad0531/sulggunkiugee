@@ -10,40 +10,51 @@ public class SceneMoving : MonoBehaviour
 
     public static SceneMoving Instance { get; private set; }
 
+    private void UnloadCurrentScene()
+    {
+        // 메인 씬은 항상 유지
+        Scene active = SceneManager.GetActiveScene();
+
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            Scene scene = SceneManager.GetSceneAt(i);
+
+            if (scene.name != "Main" && scene.isLoaded)
+            {
+                SceneManager.UnloadSceneAsync(scene.name);
+            }
+        }
+    }
+
     public void MoveTDiamondDungeon()
     {
-        currentScene = SceneManager.GetActiveScene();
-        SceneManager.UnloadSceneAsync(currentScene);
+        UnloadCurrentScene();
         SceneManager.LoadScene("DIamondDungeon", LoadSceneMode.Additive);
     }
 
     public void MoveToStage()
     {
         stage = GameManager.Instance.getStage();
-        currentScene = SceneManager.GetActiveScene();
-        SceneManager.UnloadSceneAsync(currentScene);
+        UnloadCurrentScene();
         SceneManager.LoadScene("Stage" + stage.Item1, LoadSceneMode.Additive);
     }
 
     public void MoveToTutorial()
     {
-        currentScene = SceneManager.GetActiveScene();
-        SceneManager.UnloadSceneAsync(currentScene);
-        SceneManager.LoadScene("Tutorial");
+        UnloadCurrentScene();
+        SceneManager.LoadScene("Tutorial", LoadSceneMode.Additive);
     }
 
     public void StartHappyEnding()
     {
-        currentScene = SceneManager.GetActiveScene();
-        SceneManager.UnloadSceneAsync(currentScene);
-        SceneManager.LoadScene("HappyEnding");
+        UnloadCurrentScene();
+        SceneManager.LoadScene("HappyEnding", LoadSceneMode.Additive);
     }
 
     public void StartBadEnding()
     {
-        currentScene = SceneManager.GetActiveScene();
-        SceneManager.UnloadSceneAsync(currentScene);
-        SceneManager.LoadScene("BadEnding");
+        UnloadCurrentScene();
+        SceneManager.LoadScene("BadEnding", LoadSceneMode.Additive);
     }
 
     private void Awake()
