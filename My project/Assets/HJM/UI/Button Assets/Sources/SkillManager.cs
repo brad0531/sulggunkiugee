@@ -20,11 +20,10 @@ public class SkillManager : MonoBehaviour
         
         if (GameManager.Instance.UserData.skill_set[index] == -1)
             return;
-        Debug.Log($"스킬호출::{index}");
         
+Debug.Log($"스킬호출::{index}");
         if (!GameManager.Instance.isSkill_CoolTimeEnd(index))
             return;
-
         
         GameManager.Instance.Skill_Use(index);
         PlayerController.Instance.SkillActive(index, GameManager.Instance.Load_Skill_Damage(index, GameManager.Instance.get_Skill_level(index)), GameManager.Instance.Load_Skill_HitCount(index));
