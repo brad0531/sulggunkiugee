@@ -47,6 +47,7 @@ public class UIController : MonoBehaviour
 
             if (Last_index == 5)
             {
+                Debug.Log("공격력 버튼 활성화");
                 ATK.GetComponent<Button>().interactable = true;
             }
             else if (Last_index == 8)

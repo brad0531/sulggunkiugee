@@ -1008,7 +1008,6 @@ public class GameManager : MonoBehaviour
                 UserData.Max_stage = UserData.stage;
             else if (UserData.stage.Main == UserData.Max_stage.Main && UserData.stage.Sub > UserData.Max_stage.Sub)
                 UserData.Max_stage = UserData.stage;
-            SceneMoving.Instance.MoveToStage();
             return;
         }
         UserData.stage = new StageType<int, int, int>(stage);
@@ -1027,7 +1026,6 @@ public class GameManager : MonoBehaviour
                 UserData.Max_stage = UserData.stage;
             else if (UserData.stage.Main == UserData.Max_stage.Main && UserData.stage.Sub > UserData.Max_stage.Sub)
                 UserData.Max_stage = UserData.stage;
-            SceneMoving.Instance.MoveToStage();
             return;
         }
         UserData.stage = new StageType<int, int, int>(stage);
