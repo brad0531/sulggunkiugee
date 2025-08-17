@@ -16,15 +16,34 @@ public class Diamond : MonoBehaviour
     private int PuppetMaxHP;
     private int PuppetcurrentHP;
 
+    public bool inDungeon;
+    public GameObject Puppet;
+
     #endregion
     private void Start()
     {
+        _totalDamage = 0;
+        diamond = 0;
+        _startTime = Time.time;
 
+        GameManager.Instance.setMonsterHP(1000000000);
+        inDungeon = true;
+        Debug.Log(GameManager.Instance.getDiamond());
     }
     private void Update()
     {
-        _totalDamage = PuppetMaxHP - PuppetcurrentHP;
-        diamond = (int)(_totalDamage / 10.0);
+        if(inDungeon && Time.time - _startTime >= measurementDuration)
+        { 
+            PuppetMaxHP = GameManager.Instance.getMonsterMaxHP();
+            PuppetcurrentHP = GameManager.Instance.getMonsterHP();
+            _totalDamage = PuppetMaxHP - PuppetcurrentHP;
+            diamond = (int)(_totalDamage / 10);
+
+            SceneMoving.Instance.MoveToStage();
+            AddDiamond();
+
+            Debug.Log(GameManager.Instance.getDiamond());
+        }
     }
 
     private void AddDiamond()
