@@ -36,6 +36,7 @@ public class SceneMoving : MonoBehaviour
     {
         stage = GameManager.Instance.getStage();
         UnloadCurrentScene();
+        Diamond.Instance.inDungeon = false;
 
         if (stage.Item1 == 0)
         {
@@ -50,6 +51,7 @@ public class SceneMoving : MonoBehaviour
 
     public void MoveToTutorial()
     {
+        Diamond.Instance.inDungeon = false;
         UnloadCurrentScene();
         SceneManager.LoadScene("Tutorial", LoadSceneMode.Additive);
     }

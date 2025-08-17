@@ -19,7 +19,23 @@ public class Diamond : MonoBehaviour
     public bool inDungeon;
     public GameObject Puppet;
 
+    public static Diamond Instance { get; private set; }
+
     #endregion
+
+    private void Awake()
+    {
+        // 싱글턴(오브젝트가 중복되지 않고 하나만 존재하도록) 설정
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     private void Start()
     {
         _totalDamage = 0;

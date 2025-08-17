@@ -30,7 +30,22 @@ public class StageManager : MonoBehaviour
     private List<GameObject> enemiesList = new List<GameObject>();
 
     private PlayerController playercontroller;
-    public Dialogue dialogue;
+
+    public static StageManager Instance { get; private set; }
+
+
+    private void Awake()
+    {
+        // 싱글턴(오브젝트가 중복되지 않고 하나만 존재하도록) 설정
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private IEnumerator PlayerRespawnDelay(float delay)
     {
@@ -56,7 +71,7 @@ public class StageManager : MonoBehaviour
     void TutorialSpawnMonster() 
     {
         PlayerRespawnDelay(delay);
-        StartCoroutine(dialogue.TutorialDialogue(index));
+        StartCoroutine(Dialogue.Instance.TutorialDialogue(index));
         enemiesList.Clear();
         Vector3 playerPosition = GameObject.FindWithTag("Player").transform.position;
         for (int i = 0; i < 50; i++)
@@ -81,7 +96,7 @@ public class StageManager : MonoBehaviour
         isRespawning = false;
 
         stage = GameManager.Instance.getStage();
-        StartCoroutine(dialogue.MainDialogue(index, stage.Item1));
+        StartCoroutine(Dialogue.Instance.MainDialogue(index, stage.Item1, Dialogue.Instance.turn));
     }
 
     void Respawn()
@@ -205,14 +220,19 @@ public class StageManager : MonoBehaviour
                 BossSpawn();
                 if (!isRespawning && enemiesList.All(e => e != null && !e.activeSelf) && BossMon != null && !BossMon.activeSelf)
                 {
-                    _currentStage++;
-                    GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
-
-                    if(_currentStage != 7)
+                    Dialogue.Instance.turn = false;
+                    Dialogue.Instance.MainDialogue(index, stage.Item1, Dialogue.Instance.turn);
+                    /* 준민이가 script 퍼블릭으로 바꿔주면 주석 푸센
+                     if(index >= GameManager.Instance.Scripts.Second.Count)
                     {
-                        SceneMoving.Instance.MoveToStage();
-                    }
-                    
+                        _currentStage++;
+                        GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
+
+                        if (_currentStage != 7)
+                        {
+                            SceneMoving.Instance.MoveToStage();
+                        }
+                    } */
                 }
             }
             

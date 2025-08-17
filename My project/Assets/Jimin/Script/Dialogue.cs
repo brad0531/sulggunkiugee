@@ -9,7 +9,6 @@ using UnityEngine.InputSystem;
 
 public class Dialogue : MonoBehaviour
 {
-    // ÁöÇÇÆ¼ ¾È¾¸ 
     public TMP_Text targetText;
     public TMP_Text targetName;
 
@@ -20,6 +19,7 @@ public class Dialogue : MonoBehaviour
 
     private float delay = 0.075f;
     public int index = 0;
+    public bool turn;
     private float clickCooldown = 0.3f;
     private float lastClickTime = 0;
 
@@ -27,11 +27,12 @@ public class Dialogue : MonoBehaviour
 
     private bool isTyping = false;
 
-    public IEnumerator MainDialogue(int index, int m)
+
+    public IEnumerator MainDialogue(int index, int m, bool turn)
     {
         isTyping = true;
 
-        var script = GameManager.Instance.getScript(m, true, index);
+        var script = GameManager.Instance.getScript(m, turn, index);
         string speaker = script.Item1;
         string dialogue = script.Item2;
 
@@ -136,7 +137,7 @@ public class Dialogue : MonoBehaviour
 
         if (isTyping)
         {
-            StopCoroutine(MainDialogue(index, stage.Item1));
+            StopCoroutine(MainDialogue(index, stage.Item1, turn));
             targetText.text = dialogue;
             isTyping = false;
             return;
@@ -145,7 +146,7 @@ public class Dialogue : MonoBehaviour
         if (!isTyping)
         {
             index++;
-            StartCoroutine(MainDialogue(index, stage.Item1));
+            StartCoroutine(MainDialogue(index, stage.Item1, turn));
         }
     }
 
