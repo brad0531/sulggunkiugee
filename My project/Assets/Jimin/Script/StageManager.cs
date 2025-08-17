@@ -221,9 +221,8 @@ public class StageManager : MonoBehaviour
                 if (!isRespawning && enemiesList.All(e => e != null && !e.activeSelf) && BossMon != null && !BossMon.activeSelf)
                 {
                     Dialogue.Instance.turn = false;
-                    Dialogue.Instance.MainDialogue(index, stage.Item1, Dialogue.Instance.turn);
-                    /* 준민이가 script 퍼블릭으로 바꿔주면 주석 푸센
-                     if(index >= GameManager.Instance.Scripts.Second.Count)
+                    StartCoroutine(Dialogue.Instance.MainDialogue(index, stage.Item1, Dialogue.Instance.turn));
+                    if(index > GameManager.Instance.Scripts.Second.Count)
                     {
                         _currentStage++;
                         GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
@@ -232,7 +231,7 @@ public class StageManager : MonoBehaviour
                         {
                             SceneMoving.Instance.MoveToStage();
                         }
-                    } */
+                    } 
                 }
             }
             

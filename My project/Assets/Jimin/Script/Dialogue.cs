@@ -134,19 +134,21 @@ public class Dialogue : MonoBehaviour
         string name = script.Item1;
         string dialogue = script.Item2;
 
-
-        if (isTyping)
+        if (index < GameManager.Instance.Scripts.Second.Count)
         {
-            StopCoroutine(MainDialogue(index, stage.Item1, turn));
-            targetText.text = dialogue;
-            isTyping = false;
-            return;
-        }
+            if (isTyping)
+            {
+                StopCoroutine(MainDialogue(index, stage.Item1, turn));
+                targetText.text = dialogue;
+                isTyping = false;
+                return;
+            }
 
-        if (!isTyping)
-        {
-            index++;
-            StartCoroutine(MainDialogue(index, stage.Item1, turn));
+            if (!isTyping)
+            {
+                index++;
+                StartCoroutine(MainDialogue(index, stage.Item1, turn));
+            }
         }
     }
 
