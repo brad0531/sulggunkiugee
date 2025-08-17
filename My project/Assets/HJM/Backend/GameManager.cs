@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     private List<double> ATKspeed_levels_lists = new List<double>();
     private List<double> CRIpercent_levels_lists = new List<double>();
     private Dictionary<Tuple<int, int, int>, Tuple<int, int, int>> Monster_lists = new Dictionary<Tuple<int, int, int>, Tuple<int, int, int>>();
-    private Pair<Tuple<int, bool>, List<Tuple<string, string>>> Scripts = new Pair<Tuple<int, bool>, List<Tuple<string, string>>>(new Tuple<int, bool>(0, true), new List<Tuple<string, string>>());
+    public Pair<Tuple<int, bool>, List<Tuple<string, string>>> Scripts = new Pair<Tuple<int, bool>, List<Tuple<string, string>>>(new Tuple<int, bool>(0, true), new List<Tuple<string, string>>());
     public List<List<int>> Info_Alcohol = new List<List<int>>();
     public List<List<int>> Snacks = new List<List<int>>();
     public List<List<int>> Skill_Cost = new List<List<int>>();
