@@ -12,14 +12,14 @@ public class SceneMoving : MonoBehaviour
 
     private void UnloadCurrentScene()
     {
-        // 메인 씬, 준민 정재 씬은 항상 유지
+        // 메인 씬, 준민이 UI씬은 항상 유지
         Scene active = SceneManager.GetActiveScene();
 
         for (int i = 0; i < SceneManager.sceneCount; i++)
         {
             Scene scene = SceneManager.GetSceneAt(i);
 
-            if (scene.name != "Main" && scene.name != "SJJ_scene" && scene.name != "HJM" && scene.isLoaded)
+            if (scene.name != "Main" && scene.name != "HJM" && scene.isLoaded)
             {
                 SceneManager.UnloadSceneAsync(scene.name);
             }
@@ -51,7 +51,6 @@ public class SceneMoving : MonoBehaviour
 
     public void MoveToTutorial()
     {
-        Diamond.Instance.inDungeon = false;
         UnloadCurrentScene();
         SceneManager.LoadScene("Tutorial", LoadSceneMode.Additive);
     }
@@ -82,9 +81,8 @@ public class SceneMoving : MonoBehaviour
     }
     private void Start()
     {
-        SceneManager.LoadScene("Tutorial", LoadSceneMode.Additive);
         SceneManager.LoadScene("HJM", LoadSceneMode.Additive);
-        SceneManager.LoadScene("SJJ_scene", LoadSceneMode.Additive);
+        MoveToTutorial();
     }
 
     private void Update()
@@ -94,14 +92,18 @@ public class SceneMoving : MonoBehaviour
         // 해피엔딩
         if (stage.Item1 == 7 && stage.Item2 == 0)
         {
-            SceneMoving.Instance.StartHappyEnding();
+            int Mainstage = stage.Item1;
+            Mainstage++;
+            GameManager.Instance.setStage(new Tuple<int, int>(Mainstage, stage.Item2));
+            StartHappyEnding();
         }
 
         // 배드 엔딩
         int liver = GameManager.Instance.getLiver();
         if (liver >= 10000)
         {
-            SceneMoving.Instance.StartBadEnding();
+            GameManager.Instance.setLiver(0);
+            StartBadEnding();
         }
     }
 }

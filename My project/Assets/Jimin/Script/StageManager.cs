@@ -29,8 +29,6 @@ public class StageManager : MonoBehaviour
 
     private List<GameObject> enemiesList = new List<GameObject>();
 
-    private PlayerController playercontroller;
-
     public static StageManager Instance { get; private set; }
 
 
@@ -52,7 +50,7 @@ public class StageManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         //_currentStage = Mathf.Max(1, _currentStage - 1);
         //GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
-        playercontroller.HandlePlayerRespawn();
+        PlayerController.Instance.HandlePlayerRespawn();
     }
 
     void SpawnMonsters()
@@ -65,7 +63,7 @@ public class StageManager : MonoBehaviour
             enemiesList.Add(enemies);
         }
         isRespawning = false;
-        playercontroller.RegisterMonsters();
+        PlayerController.Instance.RegisterMonsters();
     }
 
     void TutorialSpawnMonster() 
