@@ -27,6 +27,52 @@ public class Dialogue : MonoBehaviour
 
     private bool isTyping = false;
 
+    private void Awake()
+    {
+        // 싱글턴(오브젝트가 중복되지 않고 하나만 존재하도록) 설정
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (Time.time - lastClickTime > clickCooldown)
+        {
+            if ((Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame) ||
+            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame))
+            {
+                Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+
+                Debug.Log(stage.Item1);
+
+                if (stage.Item1 == 0)
+                {
+                    HandleTutorialClick();
+                }
+
+                if (stage.Item1 != 0)
+                {
+                    HandleClick();
+                }
+
+                if (stage.Item1 == 0 && index == 38 && !isTyping)
+                {
+                    var script = GameManager.Instance.getScript(0, false, index);
+                    string speaker = script.Item1;
+                    string dialogue = script.Item2;
+
+                    TutorialText.text = "";
+                    TutorialName.text = "";
+                }
+            }
+        }
+    }
 
     public IEnumerator MainDialogue(int index, int m, bool turn)
     {
@@ -148,58 +194,6 @@ public class Dialogue : MonoBehaviour
             {
                 index++;
                 StartCoroutine(MainDialogue(index, stage.Item1, turn));
-            }
-        }
-    }
-
-    void Start()
-    {
-
-    }
-
-    private void Awake()
-    {
-        // 싱글턴(오브젝트가 중복되지 않고 하나만 존재하도록) 설정
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    void FixedUpdate()
-    {
-        if (Time.time - lastClickTime > clickCooldown)
-        {
-            if ((Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame) ||
-            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame))
-            {
-                Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
-
-                Debug.Log(stage.Item1);
-
-                if (stage.Item1 == 0)
-                {
-                    HandleTutorialClick();
-                }
-
-                if (stage.Item1 != 0)
-                {
-                    HandleClick();
-                }
-
-                if (stage.Item1 == 0 && index == 38 && !isTyping)
-                {
-                    var script = GameManager.Instance.getScript(0, false, index);
-                    string speaker = script.Item1;
-                    string dialogue = script.Item2;
-
-                    TutorialText.text = "";
-                    TutorialName.text = "";
-                }
             }
         }
     }

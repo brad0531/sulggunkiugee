@@ -9,6 +9,46 @@ public class SceneMoving : MonoBehaviour
     private Scene currentScene;
 
     public static SceneMoving Instance { get; private set; }
+    private void Awake()
+    {
+        // 싱글턴(오브젝트가 중복되지 않고 하나만 존재하도록) 설정
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void Start()
+    {
+        SceneManager.LoadScene("HJM", LoadSceneMode.Additive);
+        MoveToTutorial();
+    }
+
+    private void Update()
+    {
+        stage = GameManager.Instance.getStage();
+
+        // 해피엔딩
+        if (stage.Item1 == 7 && stage.Item2 == 0)
+        {
+            int Mainstage = stage.Item1;
+            Mainstage++;
+            GameManager.Instance.setStage(new Tuple<int, int>(Mainstage, stage.Item2));
+            StartHappyEnding();
+        }
+
+        // 배드 엔딩
+        int liver = GameManager.Instance.getLiver();
+        if (liver >= 10000)
+        {
+            GameManager.Instance.setLiver(0);
+            StartBadEnding();
+        }
+    }
 
     private void UnloadCurrentScene()
     {
@@ -65,46 +105,6 @@ public class SceneMoving : MonoBehaviour
     {
         UnloadCurrentScene();
         SceneManager.LoadScene("BadEnding", LoadSceneMode.Additive);
-    }
-
-    private void Awake()
-    {
-        // 싱글턴(오브젝트가 중복되지 않고 하나만 존재하도록) 설정
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-    private void Start()
-    {
-        SceneManager.LoadScene("HJM", LoadSceneMode.Additive);
-        MoveToTutorial();
-    }
-
-    private void Update()
-    {
-        stage = GameManager.Instance.getStage();
-
-        // 해피엔딩
-        if (stage.Item1 == 7 && stage.Item2 == 0)
-        {
-            int Mainstage = stage.Item1;
-            Mainstage++;
-            GameManager.Instance.setStage(new Tuple<int, int>(Mainstage, stage.Item2));
-            StartHappyEnding();
-        }
-
-        // 배드 엔딩
-        int liver = GameManager.Instance.getLiver();
-        if (liver >= 10000)
-        {
-            GameManager.Instance.setLiver(0);
-            StartBadEnding();
-        }
     }
 }
 

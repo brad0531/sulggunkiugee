@@ -11,7 +11,6 @@ public class Diamond : MonoBehaviour
 
     private float _startTime;
     private float _totalDamage;
-    private bool _isMeasuring;
     private int diamond;
     private int PuppetMaxHP;
     private int PuppetcurrentHP;

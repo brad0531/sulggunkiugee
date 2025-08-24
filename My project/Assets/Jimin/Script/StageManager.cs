@@ -45,6 +45,92 @@ public class StageManager : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        GameManager.Instance.setStage(stage);
+        stage = GameManager.Instance.getStage();
+
+        if (stage.Item1 == 0 && stage.Item2 == 0) //튜토리얼 스테이지가 0 - 0 이라고 할때
+        {
+            TutorialSpawnMonster();
+        }
+        else
+        {
+            SpawnMonsters();
+        }
+    }
+
+    void FixedUpdate()
+    {
+
+        //Playerdying();
+
+        // 튜토리얼
+        if (stage.Item1 == 0 && stage.Item2 == 0)
+        {
+
+            if (!tutorialClear && enemiesList.All(e => e != null && !e.activeSelf))
+            {
+                enemiesList.Clear();
+                FadeInOut.Fade(fadeEffect);
+                TutorialSpawnMonster();
+            }
+
+            if (tutorialClear)
+            {
+                GameObject.FindWithTag("enemy").SetActive(false);
+                enemiesList.Clear();
+                GameManager.Instance.setStage(new Tuple<int, int>(1, 0));
+                SceneMoving.Instance.MoveToStage();
+                Respawn();
+            }
+        }
+
+        //n-0 ~ n-4
+        if (stage.Item1 >= 1 && stage.Item2 <= 4)
+        {
+            if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning) //몬스터가 비활성화 될 시
+            {
+                enemiesList.Clear();
+                subStage++;
+                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, subStage));
+                Respawn();
+            }
+        }
+
+
+
+        else if (stage.Item1 <= 6 && stage.Item2 == 5)
+        {
+            if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning)
+            {
+                // n-5
+                FadeInOut.Fade(fadeEffect);
+                GameObject.FindWithTag("enemy").SetActive(false);
+                enemiesList.Clear();
+
+                PlayerRespawnDelay(delay);
+                BossSpawn();
+                if (!isRespawning && enemiesList.All(e => e != null && !e.activeSelf) && BossMon != null && !BossMon.activeSelf)
+                {
+                    Dialogue.Instance.turn = false;
+                    StartCoroutine(Dialogue.Instance.MainDialogue(index, stage.Item1, Dialogue.Instance.turn));
+                    if (index > GameManager.Instance.Scripts.Second.Count)
+                    {
+                        _currentStage++;
+                        GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
+
+                        if (_currentStage != 7)
+                        {
+                            SceneMoving.Instance.MoveToStage();
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
     private IEnumerator PlayerRespawnDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -104,7 +190,6 @@ public class StageManager : MonoBehaviour
         SpawnMonsters();
     }
 
-
      void Playerdying()
     {
          //if(플레이어 죽음 판정 시)
@@ -144,95 +229,6 @@ public class StageManager : MonoBehaviour
                 subStage = stage.Item2 - 1;
                 GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, subStage));
             }
-
         }
     } 
-
-
-
-    void Start()
-    {
-        GameManager.Instance.setStage(stage);
-        stage = GameManager.Instance.getStage();
-
-        if (stage.Item1 == 0 && stage.Item2 == 0) //튜토리얼 스테이지가 0 - 0 이라고 할때
-        {
-            TutorialSpawnMonster();
-        }
-        else
-        {
-          SpawnMonsters();
-        }
-    }
-
-    void Update()
-    {
-
-        //Playerdying();
-
-        // 튜토리얼
-        if (stage.Item1 == 0 && stage.Item2 == 0)
-        {
-
-            if (!tutorialClear && enemiesList.All(e => e != null && !e.activeSelf))
-            {
-                enemiesList.Clear();
-                FadeInOut.Fade(fadeEffect);
-                TutorialSpawnMonster();
-            }
-
-            if(tutorialClear)
-            {
-                GameObject.FindWithTag("enemy").SetActive(false);
-                enemiesList.Clear();
-                GameManager.Instance.setStage(new Tuple<int, int>(1, 0));
-                SceneMoving.Instance.MoveToStage();
-                Respawn();
-            }
-        }
-
-        //n-0 ~ n-4
-        if (stage.Item1 >= 1 && stage.Item2 <= 4)
-        {
-            if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning) //몬스터가 비활성화 될 시
-            {
-                enemiesList.Clear();
-                subStage++;
-                GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, subStage));
-                Respawn();
-            }
-        }
-   
-        
-
-        else if (stage.Item1 <= 6 && stage.Item2 == 5) 
-        {
-            if (enemiesList.All(e => e != null && !e.activeSelf) && !isRespawning )
-            {
-                // n-5
-                FadeInOut.Fade(fadeEffect);
-                GameObject.FindWithTag("enemy").SetActive(false);
-                enemiesList.Clear();
-
-                PlayerRespawnDelay(delay);
-                BossSpawn();
-                if (!isRespawning && enemiesList.All(e => e != null && !e.activeSelf) && BossMon != null && !BossMon.activeSelf)
-                {
-                    Dialogue.Instance.turn = false;
-                    StartCoroutine(Dialogue.Instance.MainDialogue(index, stage.Item1, Dialogue.Instance.turn));
-                    if(index > GameManager.Instance.Scripts.Second.Count)
-                    {
-                        _currentStage++;
-                        GameManager.Instance.setStage(new Tuple<int, int>(_currentStage, 0));
-
-                        if (_currentStage != 7)
-                        {
-                            SceneMoving.Instance.MoveToStage();
-                        }
-                    } 
-                }
-            }
-            
-        }
-    }
 }
